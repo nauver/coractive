@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Interactive Wall CoR — EN/FR/DE</title>
+<title>Interactive Wall CoR — Europe Day</title>
 <style>
   :root{
     --eu-blue:#003399; --eu-blue-2:#0b1e5b; --eu-gold:#ffd617; --eu-gold-2:#ffcc00;
@@ -17,55 +17,71 @@
   video{position:absolute;inset:0;width:1px;height:1px;opacity:0;pointer-events:none}
   canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 
-  .overlay{position:absolute;inset:0;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;text-align:center;padding:4vmin;z-index:5;pointer-events:none}
-  .overlay .card,.overlay button,.overlay .modes,.overlay .camwrap,.overlay select,.overlay .langsw{pointer-events:auto}
+  .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:4vmin;z-index:5;pointer-events:none}
+  .overlay .card,.overlay button,.overlay .modes,.overlay .camwrap,.overlay select,.overlay .langsw,
+  .overlay table,.overlay .row2{pointer-events:auto}
 
-  .brandbar{position:absolute;top:0;left:0;right:0;height:8px;
-    background:linear-gradient(90deg,var(--eu-blue),var(--eu-gold));z-index:8}
+  .brandbar{position:absolute;top:0;left:0;right:0;height:8px;background:linear-gradient(90deg,var(--eu-blue),var(--eu-gold));z-index:8}
 
-  h1{font-size:clamp(26px,4.6vmin,60px);margin:0 0 1vmin;letter-spacing:.5px}
-  .sub{font-size:clamp(15px,2.1vmin,24px);opacity:.85;max-width:860px;margin:0 auto 3vmin}
-  .stars{color:var(--eu-gold);letter-spacing:6px;font-size:clamp(18px,2.4vmin,28px);margin-bottom:1.4vmin}
+  h1{font-size:clamp(24px,4.2vmin,54px);margin:0 0 1vmin;letter-spacing:.5px}
+  h2{font-size:clamp(22px,3.4vmin,40px);margin:0 0 2vmin}
+  .sub{font-size:clamp(14px,2vmin,22px);opacity:.85;max-width:860px;margin:0 auto 2.4vmin}
+  .stars{color:var(--eu-gold);letter-spacing:6px;font-size:clamp(16px,2.2vmin,26px);margin-bottom:1vmin}
 
-  /* language switcher */
   .langsw{display:inline-flex;gap:4px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);
-    border-radius:999px;padding:4px;margin-bottom:3vmin}
-  .langsw button{border:none;background:transparent;color:#fff;font-weight:700;font-size:15px;
-    padding:8px 16px;border-radius:999px;cursor:pointer;opacity:.7;transition:.15s}
+    border-radius:999px;padding:4px;margin-bottom:2.4vmin}
+  .langsw button{border:none;background:transparent;color:#fff;font-weight:700;font-size:15px;padding:8px 16px;
+    border-radius:999px;cursor:pointer;opacity:.7;transition:.15s}
   .langsw button.active{background:var(--eu-gold);color:var(--ink);opacity:1}
 
-  .modes{display:flex;gap:3vmin;flex-wrap:wrap;justify-content:center;max-width:1100px}
-  .mode{width:min(300px,80vw);background:var(--panel);border:1px solid var(--panel-line);
-    border-radius:22px;padding:3vmin 2.4vmin;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;backdrop-filter:blur(6px)}
+  .modes{display:flex;gap:2vmin;flex-wrap:wrap;justify-content:center;max-width:1180px}
+  .mode{width:min(230px,42vw);background:var(--panel);border:1px solid var(--panel-line);border-radius:20px;
+    padding:2.4vmin 1.8vmin;cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;backdrop-filter:blur(6px)}
   .mode:hover{transform:translateY(-6px);border-color:var(--eu-gold);box-shadow:0 18px 50px rgba(0,0,0,.5)}
-  .mode .ico{font-size:56px;line-height:1;margin-bottom:14px}
-  .mode h3{margin:0 0 8px;font-size:clamp(19px,2.5vmin,26px)}
-  .mode p{margin:0;opacity:.8;font-size:clamp(13px,1.7vmin,17px);line-height:1.4}
+  .mode .ico{font-size:46px;line-height:1;margin-bottom:10px}
+  .mode h3{margin:0 0 6px;font-size:clamp(17px,2.2vmin,23px)}
+  .mode p{margin:0;opacity:.8;font-size:clamp(12px,1.5vmin,15px);line-height:1.35}
 
   .btn{border:none;border-radius:999px;padding:14px 26px;font-size:16px;font-weight:600;cursor:pointer;
     background:var(--eu-gold);color:var(--ink);transition:filter .15s,transform .1s}
   .btn:hover{filter:brightness(1.08)} .btn:active{transform:scale(.97)}
   .btn.ghost{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25)}
+  .row2{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;align-items:center;margin-top:2.4vmin}
+
   .camwrap{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);
     border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:8px 16px;font-size:15px}
-  .camsel{background:transparent;color:#fff;border:none;font-size:15px;max-width:230px;cursor:pointer;outline:none}
+  .camsel{background:transparent;color:#fff;border:none;font-size:15px;max-width:220px;cursor:pointer;outline:none}
   .camsel option{color:#000}
 
-  #hud{position:absolute;top:16px;left:16px;right:16px;z-index:6;display:none;
-    justify-content:space-between;align-items:flex-start;gap:12px;pointer-events:none}
-  #hud .left,#hud .right{display:flex;gap:10px;align-items:center;pointer-events:auto}
-  .pill{background:var(--panel);border:1px solid var(--panel-line);border-radius:999px;
-    padding:10px 18px;font-weight:700;font-size:clamp(15px,2vmin,22px)}
+  #hud{position:absolute;top:16px;left:16px;right:16px;z-index:6;display:none;justify-content:center;
+    align-items:flex-start;gap:12px;pointer-events:none}
+  #hud #backBtn{position:absolute;left:0;top:0;pointer-events:auto}
+  #hud .center{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;pointer-events:auto}
+  .pill{background:var(--panel);border:1px solid var(--panel-line);border-radius:999px;padding:10px 18px;
+    font-weight:700;font-size:clamp(15px,2vmin,22px)}
   .pill small{display:block;font-weight:500;opacity:.7;font-size:.6em;letter-spacing:.5px}
 
+  table.lb{border-collapse:collapse;margin:1vmin auto;font-size:clamp(15px,2vmin,22px);min-width:min(520px,90vw)}
+  table.lb td{padding:8px 16px;border-bottom:1px solid rgba(255,255,255,.12);text-align:left}
+  table.lb td.rank{color:var(--eu-gold);font-weight:800;width:48px}
+  table.lb td.sc{text-align:right;font-weight:800}
+  table.lb tr.me td{background:rgba(255,214,23,.18)}
+  .lbcols{display:flex;gap:4vmin;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+  .lbcol h3{color:var(--eu-gold);margin:0 0 .5vmin;font-size:clamp(15px,2vmin,20px)}
+  .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;max-width:760px;margin:2vmin auto}
+  .stat{background:var(--panel);border:1px solid var(--panel-line);border-radius:16px;padding:18px}
+  .stat .n{font-size:clamp(26px,4vmin,44px);font-weight:800;color:var(--eu-gold)}
+  .stat .l{opacity:.8;font-size:14px;margin-top:4px}
+
   #boot{z-index:9}
-  .spinner{width:46px;height:46px;border-radius:50%;border:5px solid rgba(255,255,255,.2);
-    border-top-color:var(--eu-gold);animation:spin 1s linear infinite;margin-bottom:18px}
+  .spinner{width:46px;height:46px;border-radius:50%;border:5px solid rgba(255,255,255,.2);border-top-color:var(--eu-gold);
+    animation:spin 1s linear infinite;margin-bottom:18px}
   @keyframes spin{to{transform:rotate(360deg)}}
   .err{max-width:660px;background:var(--panel);border:1px solid var(--bad);border-radius:18px;padding:26px}
   .hide{display:none!important}
-  .footnote{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:12px;opacity:.55;z-index:6}
+  .footnote{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:12px;opacity:.5;z-index:6}
+  #photoImg{max-width:70vw;max-height:64vh;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
 </style>
 </head>
 <body>
@@ -81,44 +97,95 @@
   <div id="booterr" class="err hide"></div>
 </div>
 
+<!-- MENU -->
 <div id="menu" class="overlay hide">
   <div class="langsw" id="langsw">
-    <button data-lang="en">EN</button>
-    <button data-lang="fr">FR</button>
-    <button data-lang="de">DE</button>
+    <button data-lang="en">EN</button><button data-lang="fr">FR</button><button data-lang="de">DE</button>
   </div>
   <div class="stars">★ ★ ★</div>
   <h1 id="m_title"></h1>
   <p class="sub" id="m_sub"></p>
   <div class="modes">
-    <div class="mode" data-mode="quiz">
-      <div class="ico">🧠</div>
-      <h3 id="q_t"></h3><p id="q_d"></p>
-    </div>
-    <div class="mode" data-mode="catch">
-      <div class="ico">⭐</div>
-      <h3 id="c_t"></h3><p id="c_d"></p>
-    </div>
-    <div class="mode" data-mode="particles">
-      <div class="ico">✨</div>
-      <h3 id="p_t"></h3><p id="p_d"></p>
-    </div>
+    <div class="mode" data-mode="quiz"><div class="ico">🧠</div><h3 id="q_t"></h3><p id="q_d"></p></div>
+    <div class="mode" data-mode="catch"><div class="ico">⭐</div><h3 id="c_t"></h3><p id="c_d"></p></div>
+    <div class="mode" data-mode="duel"><div class="ico">⚔️</div><h3 id="d_t"></h3><p id="d_d"></p></div>
+    <div class="mode" data-mode="particles"><div class="ico">✨</div><h3 id="p_t"></h3><p id="p_d"></p></div>
+    <div class="mode" data-mode="photo"><div class="ico">📸</div><h3 id="ph_t"></h3><p id="ph_d"></p></div>
   </div>
-  <div style="margin-top:4vmin;display:flex;gap:14px;flex-wrap:wrap;justify-content:center;align-items:center">
+  <div class="row2">
+    <button class="btn ghost" id="lbBtn"></button>
     <label class="camwrap">📷&nbsp;<select id="camSel" class="camsel"></select></label>
     <button class="btn ghost" id="fsBtn"></button>
   </div>
 </div>
 
+<!-- HUD -->
 <div id="hud">
-  <div class="left">
-    <button class="btn ghost" id="backBtn"></button>
+  <button class="btn ghost" id="backBtn"></button>
+  <div class="center">
     <span class="pill" id="hudTitle"></span>
-  </div>
-  <div class="right">
+    <span class="pill hide" id="recordPill"><small id="lblRecord">RECORD</small><span id="record">0</span></span>
     <span class="pill hide" id="scorePill"><small id="lblScore">SCORE</small><span id="score">0</span></span>
     <span class="pill hide" id="timePill"><small id="lblTime">TIME</small><span id="time">45</span></span>
     <span class="pill hide" id="peoplePill"><small id="lblPeople">PEOPLE</small><span id="people">0</span></span>
+  </div>
+</div>
+
+<!-- GAME OVER -->
+<div id="gameover" class="overlay hide">
+  <div class="stars">★ ★ ★</div>
+  <h2 id="go_head"></h2>
+  <div class="pill" style="font-size:clamp(30px,6vmin,64px);padding:14px 34px" id="go_score">0</div>
+  <p class="sub" id="go_record" style="margin-top:2vmin"></p>
+  <div class="row2">
+    <button class="btn hide" id="go_save"></button>
+    <button class="btn" id="go_again"></button>
+    <button class="btn ghost" id="go_photo"></button>
+    <button class="btn ghost" id="go_lb"></button>
+    <button class="btn ghost" id="go_menu"></button>
+  </div>
+</div>
+
+<!-- DUEL OVER -->
+<div id="duelover" class="overlay hide">
+  <div class="stars">★ ★ ★</div>
+  <h2 id="du_head"></h2>
+  <p class="sub" id="du_detail"></p>
+  <div class="row2">
+    <button class="btn" id="du_again"></button>
+    <button class="btn ghost" id="du_menu"></button>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div id="leaderboard" class="overlay hide">
+  <h2 id="lb_head"></h2>
+  <div class="lbcols" id="lb_body"></div>
+  <div class="row2">
+    <button class="btn ghost" id="lb_quiz"></button>
+    <button class="btn ghost" id="lb_catch"></button>
+    <button class="btn ghost" id="lb_menu"></button>
+  </div>
+</div>
+
+<!-- PHOTO ACTIONS -->
+<div id="photoActions" class="overlay hide">
+  <img id="photoImg" alt="souvenir">
+  <div class="row2">
+    <button class="btn" id="ph_save"></button>
+    <button class="btn ghost" id="ph_retake"></button>
+    <button class="btn ghost" id="ph_menu"></button>
+  </div>
+</div>
+
+<!-- STATS (admin) -->
+<div id="stats" class="overlay hide">
+  <h2 id="st_head"></h2>
+  <div class="statgrid" id="st_grid"></div>
+  <div class="row2">
+    <button class="btn ghost" id="st_export"></button>
+    <button class="btn ghost" id="st_reset"></button>
+    <button class="btn ghost" id="st_close"></button>
   </div>
 </div>
 
@@ -134,182 +201,247 @@
   const I18N = {
     en:{
       title:"Interactive Wall — European Committee of the Regions",
-      sub:"Stand in front of the camera and pick a mode. You play with your body — no controller. Best projected on a wall.",
-      q_t:"Body Quiz", q_d:"Answer by moving your hand into the right zone. Questions on the EU and its regions.",
-      c_t:"Catch the Stars", c_d:"Stars fall — catch them with your hands. Score in 45 seconds.",
-      p_t:"Particle Mirror", p_d:"Your body draws trails of particles in Europe's colours.",
-      fullscreen:"⛶ Fullscreen", back:"← Menu",
-      hud_quiz:"🧠 Body Quiz", hud_catch:"⭐ Catch the Stars", hud_particles:"✨ Particle Mirror",
-      lblScore:"SCORE", lblTime:"TIME", lblPeople:"PEOPLE",
+      sub:"Europe Day · Stand in front of the camera and pick a mode. You play with your body — no controller.",
+      q_t:"Body Quiz", q_d:"Answer by moving your hand into the right zone. EU & CoR questions.",
+      c_t:"Catch the Stars", c_d:"Catch falling stars with your hands. 45 seconds.",
+      d_t:"Duel (2 players)", d_d:"Team A vs Team B — left against right. Who catches more?",
+      p_t:"Particle Mirror", p_d:"Your body draws trails in Europe's colours.",
+      ph_t:"Souvenir Photo", ph_d:"Strike a pose — framed keepsake you can save.",
+      fullscreen:"⛶ Fullscreen", back:"← Menu", leaderboard:"🏆 Leaderboard",
+      hud_quiz:"🧠 Body Quiz", hud_catch:"⭐ Catch the Stars", hud_duel:"⚔️ Duel", hud_particles:"✨ Particle Mirror",
+      lblScore:"SCORE", lblTime:"TIME", lblPeople:"PEOPLE", lblRecord:"RECORD",
       quiz_instr:"✋ Keep one hand in the zone of your choice",
       quiz_ok:"✔ Correct!", quiz_no:"✘ Wrong!",
-      catch_end:"Done! Stars caught: {n} ⭐",
       part_prompt:"Move in front of the camera ✨",
       boot_perm:"Allow camera access…", boot_model:"Loading detection model (MoveNet)…",
       err_title:"Unable to start.", err_denied:"Camera access was denied. Allow the camera and reload.",
       err_nocam:"No camera detected. Plug in your webcam and reload.",
-      err_hint:"Tip: open the file in Chrome, or host it over HTTPS (Netlify).",
+      err_hint:"Tip: open in Chrome, or host over HTTPS (Netlify / GitHub Pages).",
       cam_changed:"Camera switched ✔", cam_unavail:"Camera unavailable: ",
       cam_busy:"already in use by another app", cam_over:"resolution not supported", cam_denied:"access denied",
-      footnote:"Webcam · TensorFlow.js MoveNet · nothing is sent, everything runs in your browser"
+      footnote:"Webcam · TensorFlow.js MoveNet · no image is sent — everything runs in your browser",
+      go_head:"Well played!", go_new:"🏆 New high score!", go_record:"Record to beat: {n}",
+      go_again:"↻ Play again", go_photo:"📸 Souvenir photo", go_lb:"🏆 Leaderboard", go_menu:"← Menu",
+      go_save:"🏆 Save to leaderboard", gate_prompt:"Stand in the circle to start",
+      ini_title:"Enter your initials", ini_ok:"OK ✓",
+      lb_head:"🏆 Leaderboard", lb_today:"Top 10 — today", lb_best:"Best of the event", lb_empty:"No score yet",
+      lb_quiz:"Quiz", lb_catch:"Catch the Stars", lb_menu:"← Menu",
+      duel_go:"Team A on the LEFT · Team B on the RIGHT", duel_a:"Team A", duel_b:"Team B",
+      duel_win:"{t} wins!", duel_tie:"It's a tie!", du_again:"↻ Rematch", du_menu:"← Menu",
+      ph_countdown:"Get ready…", ph_save:"📥 Save photo", ph_retake:"↻ Retake", ph_menu:"← Menu",
+      ph_caption:"Europe Day · European Committee of the Regions",
+      st_head:"📊 Statistics (anonymous)", st_games:"Games played", st_avg:"Average score",
+      st_participants:"Peak simultaneous", st_most:"Most played", st_photos:"Photos taken",
+      st_export:"⬇ Export CSV", st_reset:"🗑 Reset data", st_close:"Close",
+      confirm_reset:"Erase all local scores and statistics?"
     },
     fr:{
       title:"Mur interactif — Comité européen des régions",
-      sub:"Place-toi devant la caméra et choisis un mode. Tu joues avec ton corps, sans manette. Idéal projeté sur un mur.",
-      q_t:"Quiz corporel", q_d:"Réponds en déplaçant ta main vers la bonne zone. Questions sur l'UE et les régions.",
-      c_t:"Attrape les étoiles", c_d:"Des étoiles tombent : attrape-les avec tes mains. Score en 45 secondes.",
-      p_t:"Miroir de particules", p_d:"Ton corps dessine des traînées de particules aux couleurs de l'Europe.",
-      fullscreen:"⛶ Plein écran", back:"← Menu",
-      hud_quiz:"🧠 Quiz corporel", hud_catch:"⭐ Attrape les étoiles", hud_particles:"✨ Miroir de particules",
-      lblScore:"SCORE", lblTime:"TEMPS", lblPeople:"PERSONNES",
+      sub:"Journée de l'Europe · Place-toi devant la caméra et choisis un mode. Tu joues avec ton corps, sans manette.",
+      q_t:"Quiz corporel", q_d:"Réponds en déplaçant ta main vers la bonne zone. Questions UE & CoR.",
+      c_t:"Attrape les étoiles", c_d:"Attrape les étoiles qui tombent avec tes mains. 45 secondes.",
+      d_t:"Duel (2 joueurs)", d_d:"Équipe A contre Équipe B — gauche contre droite. Qui en attrape le plus ?",
+      p_t:"Miroir de particules", p_d:"Ton corps dessine des traînées aux couleurs de l'Europe.",
+      ph_t:"Photo souvenir", ph_d:"Prends la pose — souvenir encadré à enregistrer.",
+      fullscreen:"⛶ Plein écran", back:"← Menu", leaderboard:"🏆 Classement",
+      hud_quiz:"🧠 Quiz corporel", hud_catch:"⭐ Attrape les étoiles", hud_duel:"⚔️ Duel", hud_particles:"✨ Miroir de particules",
+      lblScore:"SCORE", lblTime:"TEMPS", lblPeople:"PERSONNES", lblRecord:"RECORD",
       quiz_instr:"✋ Garde une main dans la zone de ton choix",
       quiz_ok:"✔ Bonne réponse !", quiz_no:"✘ Raté !",
-      catch_end:"Terminé ! Étoiles attrapées : {n} ⭐",
       part_prompt:"Bouge devant la caméra ✨",
       boot_perm:"Autorise l'accès à la caméra…", boot_model:"Chargement du modèle de détection (MoveNet)…",
       err_title:"Impossible de démarrer.", err_denied:"L'accès à la caméra a été refusé. Autorise-la puis recharge.",
       err_nocam:"Aucune caméra détectée. Branche ta webcam et recharge.",
-      err_hint:"Astuce : ouvre le fichier dans Chrome, ou héberge-le en HTTPS (Netlify).",
+      err_hint:"Astuce : ouvre dans Chrome, ou héberge en HTTPS (Netlify / GitHub Pages).",
       cam_changed:"Caméra changée ✔", cam_unavail:"Caméra indisponible : ",
       cam_busy:"déjà utilisée par une autre appli", cam_over:"résolution non supportée", cam_denied:"accès refusé",
-      footnote:"Webcam · TensorFlow.js MoveNet · aucune donnée envoyée, tout tourne dans le navigateur"
+      footnote:"Webcam · TensorFlow.js MoveNet · aucune image n'est envoyée — tout tourne dans le navigateur",
+      go_head:"Bien joué !", go_new:"🏆 Nouveau record !", go_record:"Record à battre : {n}",
+      go_again:"↻ Rejouer", go_photo:"📸 Photo souvenir", go_lb:"🏆 Classement", go_menu:"← Menu",
+      go_save:"🏆 Entrer au classement", gate_prompt:"Place-toi dans le cercle pour commencer",
+      ini_title:"Entre tes initiales", ini_ok:"OK ✓",
+      lb_head:"🏆 Classement", lb_today:"Top 10 — aujourd'hui", lb_best:"Meilleur de l'événement", lb_empty:"Aucun score",
+      lb_quiz:"Quiz", lb_catch:"Attrape les étoiles", lb_menu:"← Menu",
+      duel_go:"Équipe A à GAUCHE · Équipe B à DROITE", duel_a:"Équipe A", duel_b:"Équipe B",
+      duel_win:"{t} gagne !", duel_tie:"Égalité !", du_again:"↻ Revanche", du_menu:"← Menu",
+      ph_countdown:"Prépare-toi…", ph_save:"📥 Enregistrer", ph_retake:"↻ Reprendre", ph_menu:"← Menu",
+      ph_caption:"Journée de l'Europe · Comité européen des régions",
+      st_head:"📊 Statistiques (anonymes)", st_games:"Parties jouées", st_avg:"Score moyen",
+      st_participants:"Pic simultané", st_most:"Mode le plus joué", st_photos:"Photos prises",
+      st_export:"⬇ Export CSV", st_reset:"🗑 Réinitialiser", st_close:"Fermer",
+      confirm_reset:"Effacer tous les scores et statistiques locaux ?"
     },
     de:{
       title:"Interaktive Wand — Europäischer Ausschuss der Regionen",
-      sub:"Stell dich vor die Kamera und wähle einen Modus. Du spielst mit deinem Körper – ohne Controller. Ideal an eine Wand projiziert.",
-      q_t:"Körper-Quiz", q_d:"Antworte, indem du deine Hand in die richtige Zone bewegst. Fragen zur EU und ihren Regionen.",
-      c_t:"Fang die Sterne", c_d:"Sterne fallen – fang sie mit deinen Händen. Punkte in 45 Sekunden.",
-      p_t:"Partikel-Spiegel", p_d:"Dein Körper zeichnet Partikelspuren in den Farben Europas.",
-      fullscreen:"⛶ Vollbild", back:"← Menü",
-      hud_quiz:"🧠 Körper-Quiz", hud_catch:"⭐ Fang die Sterne", hud_particles:"✨ Partikel-Spiegel",
-      lblScore:"PUNKTE", lblTime:"ZEIT", lblPeople:"PERSONEN",
+      sub:"Europatag · Stell dich vor die Kamera und wähle einen Modus. Du spielst mit deinem Körper – ohne Controller.",
+      q_t:"Körper-Quiz", q_d:"Antworte, indem du deine Hand in die richtige Zone bewegst. EU- & AdR-Fragen.",
+      c_t:"Fang die Sterne", c_d:"Fang fallende Sterne mit deinen Händen. 45 Sekunden.",
+      d_t:"Duell (2 Spieler)", d_d:"Team A gegen Team B — links gegen rechts. Wer fängt mehr?",
+      p_t:"Partikel-Spiegel", p_d:"Dein Körper zeichnet Spuren in den Farben Europas.",
+      ph_t:"Erinnerungsfoto", ph_d:"Pose einnehmen — gerahmtes Andenken zum Speichern.",
+      fullscreen:"⛶ Vollbild", back:"← Menü", leaderboard:"🏆 Bestenliste",
+      hud_quiz:"🧠 Körper-Quiz", hud_catch:"⭐ Fang die Sterne", hud_duel:"⚔️ Duell", hud_particles:"✨ Partikel-Spiegel",
+      lblScore:"PUNKTE", lblTime:"ZEIT", lblPeople:"PERSONEN", lblRecord:"REKORD",
       quiz_instr:"✋ Halte eine Hand in der Zone deiner Wahl",
       quiz_ok:"✔ Richtig!", quiz_no:"✘ Falsch!",
-      catch_end:"Fertig! Gefangene Sterne: {n} ⭐",
       part_prompt:"Beweg dich vor der Kamera ✨",
       boot_perm:"Erlaube den Kamerazugriff…", boot_model:"Erkennungsmodell wird geladen (MoveNet)…",
       err_title:"Start nicht möglich.", err_denied:"Kamerazugriff verweigert. Erlaube die Kamera und lade neu.",
       err_nocam:"Keine Kamera erkannt. Schließe deine Webcam an und lade neu.",
-      err_hint:"Tipp: Öffne die Datei in Chrome oder hoste sie über HTTPS (Netlify).",
+      err_hint:"Tipp: in Chrome öffnen oder über HTTPS hosten (Netlify / GitHub Pages).",
       cam_changed:"Kamera gewechselt ✔", cam_unavail:"Kamera nicht verfügbar: ",
       cam_busy:"bereits von einer anderen App benutzt", cam_over:"Auflösung nicht unterstützt", cam_denied:"Zugriff verweigert",
-      footnote:"Webcam · TensorFlow.js MoveNet · nichts wird gesendet, alles läuft im Browser"
+      footnote:"Webcam · TensorFlow.js MoveNet · kein Bild wird gesendet — alles läuft im Browser",
+      go_head:"Gut gespielt!", go_new:"🏆 Neuer Rekord!", go_record:"Zu schlagender Rekord: {n}",
+      go_again:"↻ Nochmal", go_photo:"📸 Erinnerungsfoto", go_lb:"🏆 Bestenliste", go_menu:"← Menü",
+      go_save:"🏆 In die Bestenliste", gate_prompt:"Stell dich in den Kreis, um zu starten",
+      ini_title:"Gib deine Initialen ein", ini_ok:"OK ✓",
+      lb_head:"🏆 Bestenliste", lb_today:"Top 10 — heute", lb_best:"Bestes des Events", lb_empty:"Noch kein Ergebnis",
+      lb_quiz:"Quiz", lb_catch:"Fang die Sterne", lb_menu:"← Menü",
+      duel_go:"Team A LINKS · Team B RECHTS", duel_a:"Team A", duel_b:"Team B",
+      duel_win:"{t} gewinnt!", duel_tie:"Unentschieden!", du_again:"↻ Revanche", du_menu:"← Menü",
+      ph_countdown:"Mach dich bereit…", ph_save:"📥 Foto speichern", ph_retake:"↻ Wiederholen", ph_menu:"← Menü",
+      ph_caption:"Europatag · Europäischer Ausschuss der Regionen",
+      st_head:"📊 Statistik (anonym)", st_games:"Gespielte Spiele", st_avg:"Durchschnitt",
+      st_participants:"Gleichzeitig max.", st_most:"Meistgespielt", st_photos:"Fotos",
+      st_export:"⬇ CSV export", st_reset:"🗑 Zurücksetzen", st_close:"Schließen",
+      confirm_reset:"Alle lokalen Ergebnisse und Statistiken löschen?"
     }
   };
+
+  /* Banque de questions — modifie librement. correct = index de la bonne réponse dans [a,b].
+     NB: la question sur la présidence du Conseil de l'UE change chaque semestre :
+     au 2e sem. 2026 c'est l'Irlande — à mettre à jour ensuite (voir 'presidency'). */
   const QUIZ = {
     en:[
       {q:"How many member states does the EU have?", a:"27", b:"28", correct:0},
-      {q:"Where is the seat of the Committee of the Regions?", a:"Brussels", b:"Strasbourg", correct:0},
+      {q:"What is the role of the CoR?", a:"Represent cities & regions", b:"Manage the euro", correct:0},
+      {q:"How many members does the CoR have?", a:"329", b:"705", correct:0},
+      {q:"The CoR is a body that is…", a:"Advisory", b:"Judicial", correct:0},
+      {q:"Where is the seat of the CoR?", a:"Brussels", b:"Luxembourg", correct:0},
+      {q:"What is EuroPCom?", a:"Europe's public-communication conference", b:"A regional funding programme", correct:0, id:"europcom"},
+      {q:"Which country holds the EU Council presidency now?", a:"Ireland", b:"Cyprus", correct:0, id:"presidency"},
       {q:"How many stars are on the European flag?", a:"12", b:"27", correct:0},
-      {q:"The CoR mainly represents…", a:"Cities & regions", b:"Banks", correct:0},
-      {q:"What is the motto of the European Union?", a:"United in diversity", b:"Freedom first", correct:0},
-      {q:"In what year was the CoR created?", a:"1994", b:"2004", correct:0},
+      {q:"What is the motto of the EU?", a:"United in diversity", b:"Freedom first", correct:0},
       {q:"On 9 May we celebrate…", a:"Europe Day", b:"Labour Day", correct:0}
     ],
     fr:[
-      {q:"Combien d'États membres compte l'Union européenne ?", a:"27", b:"28", correct:0},
-      {q:"Où siège le Comité européen des régions ?", a:"Bruxelles", b:"Strasbourg", correct:0},
+      {q:"Combien d'États membres compte l'UE ?", a:"27", b:"28", correct:0},
+      {q:"Quel est le rôle du CoR ?", a:"Représenter les villes & régions", b:"Gérer l'euro", correct:0},
+      {q:"Combien de membres compte le CoR ?", a:"329", b:"705", correct:0},
+      {q:"Le CoR est un organe…", a:"Consultatif", b:"Judiciaire", correct:0},
+      {q:"Où siège le CoR ?", a:"Bruxelles", b:"Luxembourg", correct:0},
+      {q:"Qu'est-ce qu'EuroPCom ?", a:"La conférence de la communication publique", b:"Un fonds régional", correct:0, id:"europcom"},
+      {q:"Quel pays préside actuellement le Conseil de l'UE ?", a:"L'Irlande", b:"Chypre", correct:0, id:"presidency"},
       {q:"Combien d'étoiles sur le drapeau européen ?", a:"12", b:"27", correct:0},
-      {q:"Le CoR représente avant tout…", a:"Les villes & régions", b:"Les banques", correct:0},
-      {q:"Quelle est la devise de l'Union européenne ?", a:"Unie dans la diversité", b:"Liberté d'abord", correct:0},
-      {q:"En quelle année le CoR a-t-il été créé ?", a:"1994", b:"2004", correct:0},
+      {q:"Quelle est la devise de l'UE ?", a:"Unie dans la diversité", b:"Liberté d'abord", correct:0},
       {q:"Le 9 mai, on célèbre…", a:"La Journée de l'Europe", b:"La fête du travail", correct:0}
     ],
     de:[
       {q:"Wie viele Mitgliedstaaten hat die EU?", a:"27", b:"28", correct:0},
-      {q:"Wo hat der Ausschuss der Regionen seinen Sitz?", a:"Brüssel", b:"Straßburg", correct:0},
+      {q:"Was ist die Rolle des AdR?", a:"Städte & Regionen vertreten", b:"Den Euro verwalten", correct:0},
+      {q:"Wie viele Mitglieder hat der AdR?", a:"329", b:"705", correct:0},
+      {q:"Der AdR ist ein Organ, das…", a:"beratend ist", b:"rechtsprechend ist", correct:0},
+      {q:"Wo hat der AdR seinen Sitz?", a:"Brüssel", b:"Luxemburg", correct:0},
+      {q:"Was ist EuroPCom?", a:"Europas Konferenz für öffentliche Kommunikation", b:"Ein Regionalfonds", correct:0, id:"europcom"},
+      {q:"Welches Land hat aktuell die EU-Ratspräsidentschaft?", a:"Irland", b:"Zypern", correct:0, id:"presidency"},
       {q:"Wie viele Sterne hat die Europaflagge?", a:"12", b:"27", correct:0},
-      {q:"Der AdR vertritt vor allem…", a:"Städte & Regionen", b:"Banken", correct:0},
-      {q:"Wie lautet das Motto der Europäischen Union?", a:"In Vielfalt geeint", b:"Zuerst die Freiheit", correct:0},
-      {q:"In welchem Jahr wurde der AdR gegründet?", a:"1994", b:"2004", correct:0},
+      {q:"Wie lautet das Motto der EU?", a:"In Vielfalt geeint", b:"Zuerst die Freiheit", correct:0},
       {q:"Am 9. Mai feiern wir…", a:"Europatag", b:"Tag der Arbeit", correct:0}
     ]
   };
-  let lang = 'en';
-  (function detect(){
-    let saved=null; try{ saved=localStorage.getItem('cor_lang'); }catch(e){}
-    if(saved && I18N[saved]){ lang=saved; return; }
-    const nav=(navigator.language||'en').slice(0,2);
-    if(I18N[nav]) lang=nav;
-  })();
-  function t(k){ return (I18N[lang] && I18N[lang][k]) || I18N.en[k] || k; }
+  const QUIZ_ROUND = 5;
+
+  let lang='en';
+  (function(){ let s=null; try{s=localStorage.getItem('cor_lang');}catch(e){}
+    if(s&&I18N[s]){lang=s;return;} const n=(navigator.language||'en').slice(0,2); if(I18N[n]) lang=n; })();
+  function t(k){ return (I18N[lang]&&I18N[lang][k])||I18N.en[k]||k; }
+  function setText(id,txt){ const el=document.getElementById(id); if(el) el.textContent=txt; }
 
   function applyLang(){
-    document.documentElement.lang = lang;
+    document.documentElement.lang=lang;
     setText('m_title',t('title')); setText('m_sub',t('sub'));
     setText('q_t',t('q_t')); setText('q_d',t('q_d'));
     setText('c_t',t('c_t')); setText('c_d',t('c_d'));
+    setText('d_t',t('d_t')); setText('d_d',t('d_d'));
     setText('p_t',t('p_t')); setText('p_d',t('p_d'));
-    setText('fsBtn',t('fullscreen')); setText('backBtn',t('back'));
-    setText('lblScore',t('lblScore')); setText('lblTime',t('lblTime')); setText('lblPeople',t('lblPeople'));
+    setText('ph_t',t('ph_t')); setText('ph_d',t('ph_d'));
+    setText('fsBtn',t('fullscreen')); setText('backBtn',t('back')); setText('lbBtn',t('leaderboard'));
+    setText('lblScore',t('lblScore')); setText('lblTime',t('lblTime'));
+    setText('lblPeople',t('lblPeople')); setText('lblRecord',t('lblRecord'));
     setText('footnote',t('footnote'));
+    setText('go_again',t('go_again')); setText('go_photo',t('go_photo')); setText('go_lb',t('go_lb')); setText('go_menu',t('go_menu')); setText('go_save',t('go_save'));
+    setText('du_again',t('du_again')); setText('du_menu',t('du_menu'));
+    setText('lb_quiz',t('lb_quiz')); setText('lb_catch',t('lb_catch')); setText('lb_menu',t('lb_menu'));
+    setText('ph_save',t('ph_save')); setText('ph_retake',t('ph_retake')); setText('ph_menu',t('ph_menu'));
+    setText('st_export',t('st_export')); setText('st_reset',t('st_reset')); setText('st_close',t('st_close'));
     updateHudTitle();
-    document.querySelectorAll('#langsw button').forEach(b=>{
-      b.classList.toggle('active', b.dataset.lang===lang);
-    });
-    // recharger la banque de questions dans la langue courante si le quiz tourne
-    if(mode==='quiz' && quiz){ quiz.i = Math.min(quiz.i, QUIZ[lang].length-1); }
+    document.querySelectorAll('#langsw button').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
   }
-  function setText(id,txt){ const el=document.getElementById(id); if(el) el.textContent=txt; }
+
+  /* ============================ Storage : leaderboard + stats ============================ */
+  const LB_KEY='cor_lb_v1', ST_KEY='cor_stats_v1';
+  function loadJSON(k,def){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):def; }catch(e){ return def; } }
+  function saveJSON(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+  function todayStr(){ const d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+  function lbAll(){ return loadJSON(LB_KEY,[]); }
+  function lbFor(mode){ return lbAll().filter(e=>e.mode===mode); }
+  function lbBest(mode){ const a=lbFor(mode); return a.length?Math.max.apply(null,a.map(e=>e.score)):0; }
+  function lbTopDay(mode,n){ const d=todayStr();
+    return lbFor(mode).filter(e=>e.day===d).sort((a,b)=>b.score-a.score).slice(0,n||10); }
+  function lbTopAll(mode,n){ return lbFor(mode).sort((a,b)=>b.score-a.score).slice(0,n||10); }
+  function lbQualifies(mode,score){ if(score<=0) return false;
+    const top=lbTopDay(mode,10); return top.length<10 || score>top[top.length-1].score; }
+  function lbSave(mode,score,name){ const a=lbAll();
+    const e={mode,score,name:(name||'???').slice(0,3),day:todayStr(),ts:Date.now()}; a.push(e); saveJSON(LB_KEY,a); return e; }
+
+  function statsGet(){ return loadJSON(ST_KEY,{games:{},scoreSum:{},scoreN:{},photos:0,peak:0,first:Date.now()}); }
+  function statsBumpGame(mode){ const s=statsGet(); s.games[mode]=(s.games[mode]||0)+1; saveJSON(ST_KEY,s); }
+  function statsAddScore(mode,score){ const s=statsGet(); s.scoreSum[mode]=(s.scoreSum[mode]||0)+score;
+    s.scoreN[mode]=(s.scoreN[mode]||0)+1; saveJSON(ST_KEY,s); }
+  function statsPhoto(){ const s=statsGet(); s.photos=(s.photos||0)+1; saveJSON(ST_KEY,s); }
+  function statsPeak(n){ const s=statsGet(); if(n>(s.peak||0)){ s.peak=n; saveJSON(ST_KEY,s); } }
 
   /* ============================ Setup ============================ */
-  const video=document.getElementById('cam'), canvas=document.getElementById('canvas'),
-        ctx=canvas.getContext('2d'), boot=document.getElementById('boot'),
-        bootMsg=document.getElementById('bootmsg'), bootErr=document.getElementById('booterr'),
+  const video=document.getElementById('cam'), canvas=document.getElementById('canvas'), ctx=canvas.getContext('2d'),
+        boot=document.getElementById('boot'), bootMsg=document.getElementById('bootmsg'), bootErr=document.getElementById('booterr'),
         spin=document.getElementById('spin'), menu=document.getElementById('menu'), hud=document.getElementById('hud');
+  const OVL=['menu','gameover','duelover','leaderboard','photoActions','stats'];
+  function hideOverlays(){ OVL.forEach(id=>document.getElementById(id).classList.add('hide')); }
 
-  let detector=null, mode='menu', poses=[], W=0,H=0, vW=640,vH=480;
+  let detector=null, screen='menu', poses=[], W=0,H=0, vW=640,vH=480;
   const KP_MIN=0.30;
   const EU_COLORS=['#ffd617','#4d8cff','#ffffff','#6ee7ff','#ffb020','#8affc1'];
+  let lastMode='quiz', lastScore=0;
 
   /* ---------------- Caméra ---------------- */
   let currentStream=null;
-  function constraintsFor(deviceId){
-    return deviceId ? [
-      { deviceId:{exact:deviceId}, width:{ideal:1280}, height:{ideal:720} },
-      { deviceId:deviceId,          width:{ideal:1280}, height:{ideal:720} },
-      { deviceId:{exact:deviceId} },
-      { deviceId:deviceId }
-    ] : [
-      { facingMode:'user', width:{ideal:1280}, height:{ideal:720} },
-      true
-    ];
-  }
-  async function tryAcquire(list){
-    let stream=null,lastErr=null;
-    for(const v of list){
-      try{ stream=await navigator.mediaDevices.getUserMedia({video:v,audio:false}); break; }
-      catch(e){ lastErr=e; }
-    }
-    return {stream,lastErr};
-  }
-  async function startCamera(deviceId){
-    const list=constraintsFor(deviceId);
-    let {stream,lastErr}=await tryAcquire(list);
-    if(!stream && currentStream){
-      currentStream.getTracks().forEach(t=>t.stop()); currentStream=null;
-      await new Promise(r=>setTimeout(r,350));
-      ({stream,lastErr}=await tryAcquire(list));
-    }
-    if(!stream) throw lastErr || new Error('no stream');
+  function constraintsFor(id){ return id ? [
+      {deviceId:{exact:id},width:{ideal:1280},height:{ideal:720}},
+      {deviceId:id,width:{ideal:1280},height:{ideal:720}},
+      {deviceId:{exact:id}},{deviceId:id}
+    ] : [ {facingMode:'user',width:{ideal:1280},height:{ideal:720}}, true ]; }
+  async function tryAcquire(list){ let stream=null,lastErr=null;
+    for(const v of list){ try{ stream=await navigator.mediaDevices.getUserMedia({video:v,audio:false}); break; } catch(e){ lastErr=e; } }
+    return {stream,lastErr}; }
+  async function startCamera(id){
+    const list=constraintsFor(id); let {stream,lastErr}=await tryAcquire(list);
+    if(!stream&&currentStream){ currentStream.getTracks().forEach(t=>t.stop()); currentStream=null;
+      await new Promise(r=>setTimeout(r,350)); ({stream,lastErr}=await tryAcquire(list)); }
+    if(!stream) throw lastErr||new Error('no stream');
     if(currentStream){ currentStream.getTracks().forEach(t=>t.stop()); }
-    currentStream=stream; video.srcObject=stream;
-    await video.play();
+    currentStream=stream; video.srcObject=stream; await video.play();
     await new Promise(res=>{ if(video.readyState>=2) return res(); video.onloadedmetadata=()=>res(); });
     vW=video.videoWidth||640; vH=video.videoHeight||480;
-    try{ if(deviceId) localStorage.setItem('cor_cam',deviceId); }catch(e){}
+    try{ if(id) localStorage.setItem('cor_cam',id); }catch(e){}
   }
-  async function populateCameras(){
-    try{
-      const devs=await navigator.mediaDevices.enumerateDevices();
-      const cams=devs.filter(d=>d.kind==='videoinput'); const sel=document.getElementById('camSel');
-      sel.innerHTML=''; let activeId=null;
-      if(currentStream && currentStream.getVideoTracks()[0]) activeId=currentStream.getVideoTracks()[0].getSettings().deviceId;
-      cams.forEach((c,i)=>{ const o=document.createElement('option');
-        o.value=c.deviceId; o.textContent=c.label||('Camera '+(i+1));
-        if(c.deviceId===activeId) o.selected=true; sel.appendChild(o); });
-    }catch(e){ console.warn('enumerateDevices',e); }
-  }
+  async function populateCameras(){ try{
+    const devs=await navigator.mediaDevices.enumerateDevices(); const cams=devs.filter(d=>d.kind==='videoinput');
+    const sel=document.getElementById('camSel'); sel.innerHTML=''; let act=null;
+    if(currentStream&&currentStream.getVideoTracks()[0]) act=currentStream.getVideoTracks()[0].getSettings().deviceId;
+    cams.forEach((c,i)=>{ const o=document.createElement('option'); o.value=c.deviceId; o.textContent=c.label||('Camera '+(i+1));
+      if(c.deviceId===act) o.selected=true; sel.appendChild(o); });
+  }catch(e){ console.warn(e); } }
 
   /* ---------------- Init ---------------- */
   async function init(){
@@ -317,21 +449,17 @@
     try{
       bootMsg.textContent=t('boot_perm');
       let saved=null; try{ saved=localStorage.getItem('cor_cam'); }catch(e){}
-      try{ await startCamera(saved||null); }
-      catch(e){ try{ localStorage.removeItem('cor_cam'); }catch(_){} await startCamera(null); }
+      try{ await startCamera(saved||null); } catch(e){ try{ localStorage.removeItem('cor_cam'); }catch(_){} await startCamera(null); }
       await populateCameras();
-
       bootMsg.textContent=t('boot_model');
       await tf.ready(); try{ await tf.setBackend('webgl'); }catch(e){}
       detector=await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet,{
-        modelType:poseDetection.movenet.modelType.MULTIPOSE_LIGHTNING,
-        enableTracking:true, trackerType:poseDetection.TrackerType.BoundingBox });
-
+        modelType:poseDetection.movenet.modelType.MULTIPOSE_LIGHTNING, enableTracking:true,
+        trackerType:poseDetection.TrackerType.BoundingBox });
       resize(); window.addEventListener('resize',resize);
       boot.classList.add('hide'); showMenu(); requestAnimationFrame(loop);
     }catch(err){
-      console.error(err); spin.classList.add('hide'); bootMsg.classList.add('hide');
-      bootErr.classList.remove('hide');
+      console.error(err); spin.classList.add('hide'); bootMsg.classList.add('hide'); bootErr.classList.remove('hide');
       let msg='<b>'+t('err_title')+'</b><br><br>';
       if(err&&(err.name==='NotAllowedError'||err.name==='SecurityError')) msg+=t('err_denied');
       else if(err&&err.name==='NotFoundError') msg+=t('err_nocam');
@@ -343,115 +471,154 @@
 
   /* ---- mapping vidéo -> canvas (cover + miroir) ---- */
   let coverScale=1,offX=0,offY=0,drawW=0,drawH=0;
-  function computeCover(){ coverScale=Math.max(W/vW,H/vH); drawW=vW*coverScale; drawH=vH*coverScale;
-    offX=(W-drawW)/2; offY=(H-drawH)/2; }
+  function computeCover(){ coverScale=Math.max(W/vW,H/vH); drawW=vW*coverScale; drawH=vH*coverScale; offX=(W-drawW)/2; offY=(H-drawH)/2; }
   function mapX(x){ return offX+(vW-x)*coverScale; }
   function mapY(y){ return offY+y*coverScale; }
-  function drawVideoMirrored(){
-    computeCover(); ctx.save(); ctx.translate(offX+drawW,offY); ctx.scale(-1,1);
-    ctx.drawImage(video,0,0,drawW,drawH); ctx.restore();
-    ctx.fillStyle='rgba(5,8,28,.28)'; ctx.fillRect(0,0,W,H);
-  }
+  function drawVideoMirrored(){ computeCover(); ctx.save(); ctx.translate(offX+drawW,offY); ctx.scale(-1,1);
+    ctx.drawImage(video,0,0,drawW,drawH); ctx.restore(); ctx.fillStyle='rgba(5,8,28,.30)'; ctx.fillRect(0,0,W,H); }
 
   const ADJ=[[5,7],[7,9],[6,8],[8,10],[5,6],[5,11],[6,12],[11,12],[11,13],[13,15],[12,14],[14,16]];
-  function drawSkeleton(pose,color){
-    ctx.lineWidth=Math.max(3,W*0.004); ctx.strokeStyle=color; ctx.fillStyle=color;
+  function drawSkeleton(pose,color){ ctx.lineWidth=Math.max(3,W*0.004); ctx.strokeStyle=color; ctx.fillStyle=color;
     for(const [a,b] of ADJ){ const p=pose.keypoints[a],q=pose.keypoints[b];
-      if(p.score>KP_MIN&&q.score>KP_MIN){ ctx.beginPath();
-        ctx.moveTo(mapX(p.x),mapY(p.y)); ctx.lineTo(mapX(q.x),mapY(q.y)); ctx.stroke(); } }
-    for(const p of pose.keypoints){ if(p.score>KP_MIN){ ctx.beginPath();
-      ctx.arc(mapX(p.x),mapY(p.y),Math.max(4,W*0.005),0,Math.PI*2); ctx.fill(); } }
-  }
-  function getHands(){ const hands=[]; for(const pose of poses){ for(const idx of [9,10]){
-    const p=pose.keypoints[idx]; if(p&&p.score>KP_MIN) hands.push({x:mapX(p.x),y:mapY(p.y)}); } } return hands; }
+      if(p.score>KP_MIN&&q.score>KP_MIN){ ctx.beginPath(); ctx.moveTo(mapX(p.x),mapY(p.y)); ctx.lineTo(mapX(q.x),mapY(q.y)); ctx.stroke(); } }
+    for(const p of pose.keypoints){ if(p.score>KP_MIN){ ctx.beginPath(); ctx.arc(mapX(p.x),mapY(p.y),Math.max(4,W*0.005),0,Math.PI*2); ctx.fill(); } } }
+  function getHands(){ const h=[]; for(const pose of poses){ for(const idx of [9,10]){ const p=pose.keypoints[idx];
+    if(p&&p.score>KP_MIN) h.push({x:mapX(p.x),y:mapY(p.y)}); } } return h; }
 
   /* ============================ QUIZ ============================ */
   let quiz=null;
-  function startQuiz(){ quiz={i:-1,dwellA:0,dwellB:0,locked:false,feedback:0,feedbackOk:false,score:0}; nextQuestion(); }
-  function nextQuestion(){ quiz.i=(quiz.i+1)%QUIZ[lang].length; quiz.dwellA=0; quiz.dwellB=0; quiz.locked=false; quiz.feedback=0; }
+  function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; const tmp=a[i]; a[i]=a[j]; a[j]=tmp; } return a; }
+  function buildRound(){ const src=shuffle(QUIZ[lang].slice()).slice(0,QUIZ_ROUND);
+    return src.map(o=>{ const swap=Math.random()<0.5;
+      return { q:o.q, opts: swap?[o.b,o.a]:[o.a,o.b], correctIdx: swap?(o.correct===0?1:0):o.correct }; }); }
+  function startQuiz(){ quiz={qs:buildRound(),idx:0,dwellA:0,dwellB:0,locked:false,feedback:0,feedbackOk:false,score:0}; }
   const DWELL_NEED=45;
   function updateQuiz(){
-    const cur=QUIZ[lang][quiz.i]; const hands=getHands();
-    const zoneW=W*0.34,zoneH=H*0.42,zoneY=H*0.5,zoneAx=W*0.02,zoneBx=W*0.98-zoneW;
+    const cur=quiz.qs[quiz.idx]; const hands=getHands();
+    const zoneW=W*0.34,zoneH=H*0.40,zoneY=H*0.52,zoneAx=W*0.02,zoneBx=W*0.98-zoneW;
     let inA=false,inB=false;
-    for(const h of hands){
-      if(h.x>zoneAx&&h.x<zoneAx+zoneW&&h.y>zoneY&&h.y<zoneY+zoneH) inA=true;
-      if(h.x>zoneBx&&h.x<zoneBx+zoneW&&h.y>zoneY&&h.y<zoneY+zoneH) inB=true;
-    }
-    if(!quiz.locked){
-      quiz.dwellA=inA?quiz.dwellA+1:Math.max(0,quiz.dwellA-2);
-      quiz.dwellB=inB?quiz.dwellB+1:Math.max(0,quiz.dwellB-2);
-      if(quiz.dwellA>=DWELL_NEED) answer(0); else if(quiz.dwellB>=DWELL_NEED) answer(1);
-    }else{ quiz.feedback--; if(quiz.feedback<=0) nextQuestion(); }
-
+    for(const h of hands){ if(h.x>zoneAx&&h.x<zoneAx+zoneW&&h.y>zoneY&&h.y<zoneY+zoneH) inA=true;
+      if(h.x>zoneBx&&h.x<zoneBx+zoneW&&h.y>zoneY&&h.y<zoneY+zoneH) inB=true; }
+    if(!quiz.locked){ quiz.dwellA=inA?quiz.dwellA+1:Math.max(0,quiz.dwellA-2); quiz.dwellB=inB?quiz.dwellB+1:Math.max(0,quiz.dwellB-2);
+      if(quiz.dwellA>=DWELL_NEED) answer(0); else if(quiz.dwellB>=DWELL_NEED) answer(1); }
+    else{ quiz.feedback--; if(quiz.feedback<=0){ quiz.idx++; if(quiz.idx>=quiz.qs.length){ endGame('quiz',quiz.score); return; }
+      quiz.dwellA=0; quiz.dwellB=0; quiz.locked=false; } }
     ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.font='500 '+Math.round(H*0.03)+'px system-ui,sans-serif'; ctx.fillStyle='rgba(255,255,255,.7)';
+    ctx.fillText((quiz.idx+1)+' / '+quiz.qs.length, W/2, H*0.08);
     ctx.font='700 '+Math.round(H*0.045)+'px system-ui,sans-serif'; ctx.fillStyle='#fff';
-    wrapText(cur.q,W/2,H*0.16,W*0.86,H*0.055);
-    drawZone(zoneAx,zoneY,zoneW,zoneH,cur.a,quiz.dwellA/DWELL_NEED,quiz.locked&&quiz.chosen===0,quiz.locked,cur.correct===0);
-    drawZone(zoneBx,zoneY,zoneW,zoneH,cur.b,quiz.dwellB/DWELL_NEED,quiz.locked&&quiz.chosen===1,quiz.locked,cur.correct===1);
-    if(!quiz.locked){ ctx.font='500 '+Math.round(H*0.028)+'px system-ui,sans-serif';
-      ctx.fillStyle='rgba(255,255,255,.8)'; ctx.fillText(t('quiz_instr'),W/2,H*0.30); }
-    else{ ctx.fillStyle=quiz.feedbackOk?'#3ddc84':'#ff5a6a';
-      ctx.font='800 '+Math.round(H*0.04)+'px system-ui,sans-serif';
-      ctx.fillText(quiz.feedbackOk?t('quiz_ok'):t('quiz_no'),W/2,H*0.30); }
+    wrapText(cur.q,W/2,H*0.18,W*0.86,H*0.055);
+    drawZone(zoneAx,zoneY,zoneW,zoneH,cur.opts[0],quiz.dwellA/DWELL_NEED,quiz.locked&&quiz.chosen===0,quiz.locked,cur.correctIdx===0);
+    drawZone(zoneBx,zoneY,zoneW,zoneH,cur.opts[1],quiz.dwellB/DWELL_NEED,quiz.locked&&quiz.chosen===1,quiz.locked,cur.correctIdx===1);
+    if(!quiz.locked){ ctx.font='500 '+Math.round(H*0.028)+'px system-ui,sans-serif'; ctx.fillStyle='rgba(255,255,255,.8)';
+      ctx.fillText(t('quiz_instr'),W/2,H*0.32); }
+    else{ ctx.fillStyle=quiz.feedbackOk?'#3ddc84':'#ff5a6a'; ctx.font='800 '+Math.round(H*0.04)+'px system-ui,sans-serif';
+      ctx.fillText(quiz.feedbackOk?t('quiz_ok'):t('quiz_no'),W/2,H*0.32); }
     document.getElementById('score').textContent=quiz.score;
   }
-  function answer(choice){ quiz.locked=true; quiz.chosen=choice; quiz.feedback=90;
-    quiz.feedbackOk=(choice===QUIZ[lang][quiz.i].correct); if(quiz.feedbackOk) quiz.score++; }
+  function answer(choice){ quiz.locked=true; quiz.chosen=choice; quiz.feedback=80;
+    quiz.feedbackOk=(choice===quiz.qs[quiz.idx].correctIdx); if(quiz.feedbackOk) quiz.score++; }
   function drawZone(x,y,w,h,label,prog,chosen,locked,isCorrect){
     let border='rgba(255,214,23,.6)',fill='rgba(9,20,55,.55)';
-    if(locked){ if(isCorrect){border='#3ddc84';fill='rgba(61,220,132,.25)';}
-      else if(chosen){border='#ff5a6a';fill='rgba(255,90,106,.22)';} }
+    if(locked){ if(isCorrect){border='#3ddc84';fill='rgba(61,220,132,.25)';} else if(chosen){border='#ff5a6a';fill='rgba(255,90,106,.22)';} }
     roundRect(x,y,w,h,26); ctx.fillStyle=fill; ctx.fill(); ctx.lineWidth=6; ctx.strokeStyle=border; ctx.stroke();
     if(!locked&&prog>0){ roundRect(x,y+h-16,w*Math.min(1,prog),16,8); ctx.fillStyle='#ffd617'; ctx.fill(); }
     ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.font='700 '+Math.round(h*0.16)+'px system-ui,sans-serif'; wrapText(label,x+w/2,y+h/2,w*0.86,h*0.18);
+    ctx.font='700 '+Math.round(h*0.15)+'px system-ui,sans-serif'; wrapText(label,x+w/2,y+h/2,w*0.86,h*0.17);
   }
 
-  /* ============================ CATCH ============================ */
+  /* ============================ CATCH (solo) ============================ */
   let game=null;
-  function startCatch(){ game={score:0,time:45,stars:[],bursts:[],spawn:0,last:performance.now()}; }
-  function spawnStar(){ game.stars.push({x:Math.random()*W*0.86+W*0.07,y:-40,
+  function startCatch(){ game={ready:true,readyDwell:0,score:0,time:45,stars:[],bursts:[],spawn:0,last:performance.now()}; }
+  function spawnStar(xmin,xmax){ game.stars.push({x:xmin+Math.random()*(xmax-xmin),y:-40,
     vy:(H*0.10)+Math.random()*(H*0.10),r:Math.max(26,W*0.022),rot:0,caught:false}); }
+  // Cercle de placement : uniformise la distance joueur→caméra (échelle main/étoiles cohérente)
+  const GATE_NEED=55;
+  function drawReadyGate(obj){
+    poses.forEach((p,i)=>drawSkeleton(p,EU_COLORS[i%EU_COLORS.length]));
+    const cx=W/2, cy=H*0.52, R=Math.min(W,H)*0.28;
+    let inside=false;
+    for(const pose of poses){ const n=pose.keypoints[0]; if(n&&n.score>KP_MIN){
+      if(Math.hypot(mapX(n.x)-cx, mapY(n.y)-cy)<R*0.8){ inside=true; break; } } }
+    obj.readyDwell = inside ? obj.readyDwell+1 : Math.max(0,obj.readyDwell-2);
+    ctx.setLineDash([14,12]); ctx.lineWidth=8;
+    ctx.strokeStyle = inside ? '#3ddc84' : 'rgba(255,214,23,.85)';
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
+    // anneau de progression
+    if(obj.readyDwell>0){ ctx.lineWidth=10; ctx.strokeStyle='#3ddc84'; ctx.beginPath();
+      ctx.arc(cx,cy,R,-Math.PI/2,-Math.PI/2+Math.PI*2*Math.min(1,obj.readyDwell/GATE_NEED)); ctx.stroke(); }
+    ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillStyle='#fff';
+    ctx.font='700 '+Math.round(H*0.04)+'px system-ui,sans-serif';
+    wrapText(t('gate_prompt'), cx, cy-R-H*0.06, W*0.8, H*0.05);
+    return obj.readyDwell>=GATE_NEED;
+  }
   function updateCatch(){
+    if(game.ready){ if(drawReadyGate(game)){ game.ready=false; game.last=performance.now(); } return; }
     const now=performance.now(); let dt=(now-game.last)/1000; if(dt>0.05) dt=0.05; game.last=now;
-    game.time-=dt; if(game.time<=0){ endCatch(); return; }
-    game.spawn-=dt; if(game.spawn<=0){ spawnStar(); game.spawn=0.55+Math.random()*0.4; }
+    game.time-=dt; if(game.time<=0){ endGame('catch',game.score); return; }
+    game.spawn-=dt; if(game.spawn<=0){ spawnStar(W*0.07,W*0.93); game.spawn=0.55+Math.random()*0.4; }
     const hands=getHands();
     for(const s of game.stars){ s.y+=s.vy*dt; s.rot+=dt*2;
-      if(!s.caught){ for(const h of hands){ if(Math.hypot(h.x-s.x,h.y-s.y)<s.r+W*0.03){
-        s.caught=true; game.score++; for(let k=0;k<14;k++) game.bursts.push(burst(s.x,s.y)); break; } } } }
+      if(!s.caught){ for(const h of hands){ if(Math.hypot(h.x-s.x,h.y-s.y)<s.r+W*0.03){ s.caught=true; game.score++;
+        for(let k=0;k<14;k++) game.bursts.push(burst(s.x,s.y)); break; } } } }
     game.stars=game.stars.filter(s=>!s.caught&&s.y<H+60);
-    for(const s of game.stars) drawStar(s.x,s.y,s.r,s.rot,'#ffd617');
-    updateBursts();
-    ctx.fillStyle='rgba(77,140,255,.9)';
-    for(const h of hands){ ctx.beginPath(); ctx.arc(h.x,h.y,W*0.02,0,Math.PI*2); ctx.fill(); }
-    document.getElementById('score').textContent=game.score;
-    document.getElementById('time').textContent=Math.max(0,Math.ceil(game.time));
+    for(const s of game.stars) drawStar(s.x,s.y,s.r,s.rot,'#ffd617'); updateBursts(game);
+    ctx.fillStyle='rgba(77,140,255,.9)'; for(const h of hands){ ctx.beginPath(); ctx.arc(h.x,h.y,W*0.02,0,Math.PI*2); ctx.fill(); }
+    document.getElementById('score').textContent=game.score; document.getElementById('time').textContent=Math.max(0,Math.ceil(game.time));
   }
-  function endCatch(){ const sc=game.score; setMode('menu');
-    setTimeout(()=>flash(t('catch_end').replace('{n}',sc)),50); }
-  function drawStar(cx,cy,r,rot,color){ ctx.save(); ctx.translate(cx,cy); ctx.rotate(rot); ctx.beginPath();
-    for(let i=0;i<5;i++){ const a=(Math.PI*2*i/5)-Math.PI/2; ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
-      const a2=a+Math.PI/5; ctx.lineTo(Math.cos(a2)*r*0.45,Math.sin(a2)*r*0.45); }
-    ctx.closePath(); ctx.fillStyle=color; ctx.shadowColor=color; ctx.shadowBlur=20; ctx.fill(); ctx.restore(); ctx.shadowBlur=0; }
+
+  /* ============================ DUEL (2 joueurs) ============================ */
+  let duel=null;
+  function startDuel(){ duel={a:0,b:0,time:45,stars:[],bursts:[],spawn:0,last:performance.now(),intro:2.5}; }
+  function updateDuel(){
+    const now=performance.now(); let dt=(now-duel.last)/1000; if(dt>0.05) dt=0.05; duel.last=now;
+    // ligne médiane + libellés
+    ctx.strokeStyle='rgba(255,255,255,.35)'; ctx.lineWidth=3; ctx.setLineDash([12,12]);
+    ctx.beginPath(); ctx.moveTo(W/2,0); ctx.lineTo(W/2,H); ctx.stroke(); ctx.setLineDash([]);
+    if(duel.intro>0){ duel.intro-=dt;
+      ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillStyle='#fff'; ctx.font='800 '+Math.round(H*0.05)+'px system-ui,sans-serif';
+      wrapText(t('duel_go'),W/2,H*0.5,W*0.8,H*0.06); drawSideLabels(); return; }
+    duel.time-=dt; if(duel.time<=0){ endDuel(); return; }
+    duel.spawn-=dt; if(duel.spawn<=0){ // une étoile de chaque côté
+      spawnDuelStar(W*0.05,W*0.45); spawnDuelStar(W*0.55,W*0.95); duel.spawn=0.7+Math.random()*0.4; }
+    const hands=getHands();
+    for(const s of duel.stars){ s.y+=s.vy*dt; s.rot+=dt*2;
+      if(!s.caught){ for(const h of hands){ const sameSide=(h.x<W/2)===(s.x<W/2);
+        if(sameSide&&Math.hypot(h.x-s.x,h.y-s.y)<s.r+W*0.03){ s.caught=true; if(s.x<W/2) duel.a++; else duel.b++;
+          for(let k=0;k<12;k++) duel.bursts.push(burst(s.x,s.y)); break; } } } }
+    duel.stars=duel.stars.filter(s=>!s.caught&&s.y<H+60);
+    for(const s of duel.stars) drawStar(s.x,s.y,s.r,s.rot, s.x<W/2?'#ffd617':'#6ee7ff'); updateBursts(duel);
+    ctx.fillStyle='rgba(255,255,255,.85)'; for(const h of hands){ ctx.beginPath(); ctx.arc(h.x,h.y,W*0.018,0,Math.PI*2); ctx.fill(); }
+    drawSideLabels();
+    ctx.textAlign='center'; ctx.textBaseline='top'; ctx.font='800 '+Math.round(H*0.10)+'px system-ui,sans-serif';
+    ctx.fillStyle='#ffd617'; ctx.fillText(duel.a, W*0.25, H*0.12);
+    ctx.fillStyle='#6ee7ff'; ctx.fillText(duel.b, W*0.75, H*0.12);
+    ctx.fillStyle='#fff'; ctx.font='700 '+Math.round(H*0.04)+'px system-ui,sans-serif'; ctx.fillText('⏱ '+Math.ceil(duel.time), W/2, H*0.04);
+  }
+  function drawSideLabels(){ ctx.textAlign='center'; ctx.textBaseline='top'; ctx.font='700 '+Math.round(H*0.03)+'px system-ui,sans-serif';
+    ctx.fillStyle='rgba(255,214,23,.9)'; ctx.fillText(t('duel_a'), W*0.25, H*0.055);
+    ctx.fillStyle='rgba(110,231,255,.9)'; ctx.fillText(t('duel_b'), W*0.75, H*0.055); }
+  function spawnDuelStar(xmin,xmax){ duel.stars.push({x:xmin+Math.random()*(xmax-xmin),y:-40,
+    vy:(H*0.11)+Math.random()*(H*0.10),r:Math.max(24,W*0.02),rot:0,caught:false}); }
+  function endDuel(){ statsBumpGame('duel'); let head,detail;
+    if(duel.a===duel.b){ head=t('duel_tie'); } else { head=t('duel_win').replace('{t}', duel.a>duel.b?t('duel_a'):t('duel_b')); }
+    detail=t('duel_a')+' '+duel.a+'   ·   '+t('duel_b')+' '+duel.b;
+    setText('du_head',head); setText('du_detail',detail);
+    screen='duelover'; hud.style.display='none'; hideOverlays(); document.getElementById('duelover').classList.remove('hide'); }
 
   /* ============================ PARTICLES ============================ */
   let particles=[], prevJoints={};
   function startParticles(){ particles=[]; prevJoints={}; }
   function updateParticles(){
-    poses.forEach((pose,pi)=>{ for(const idx of [9,10,7,8,0,15,16]){
-      const p=pose.keypoints[idx]; if(!p||p.score<KP_MIN) continue;
-      const x=mapX(p.x),y=mapY(p.y),key=pi+'_'+idx,prev=prevJoints[key];
-      let vx=0,vy=0,speed=0; if(prev){ vx=x-prev.x; vy=y-prev.y; speed=Math.hypot(vx,vy); }
-      prevJoints[key]={x,y}; const count=Math.min(6,Math.floor(speed/6));
-      for(let k=0;k<count;k++) particles.push({x,y,vx:vx*0.3+(Math.random()-0.5)*2,vy:vy*0.3+(Math.random()-0.5)*2,
-        life:1,r:Math.max(3,W*0.006)*(0.6+Math.random()),c:EU_COLORS[(Math.random()*EU_COLORS.length)|0]});
-    }});
+    poses.forEach((pose,pi)=>{ for(const idx of [9,10,7,8,0,15,16]){ const p=pose.keypoints[idx]; if(!p||p.score<KP_MIN) continue;
+      const x=mapX(p.x),y=mapY(p.y),key=pi+'_'+idx,prev=prevJoints[key]; let vx=0,vy=0,sp=0;
+      if(prev){ vx=x-prev.x; vy=y-prev.y; sp=Math.hypot(vx,vy); } prevJoints[key]={x,y};
+      const c=Math.min(6,Math.floor(sp/6));
+      for(let k=0;k<c;k++) particles.push({x,y,vx:vx*0.3+(Math.random()-0.5)*2,vy:vy*0.3+(Math.random()-0.5)*2,
+        life:1,r:Math.max(3,W*0.006)*(0.6+Math.random()),c:EU_COLORS[(Math.random()*EU_COLORS.length)|0]}); } });
     ctx.globalCompositeOperation='lighter';
-    for(const pt of particles){ pt.x+=pt.vx; pt.y+=pt.vy; pt.vy+=0.05; pt.life-=0.02;
-      ctx.globalAlpha=Math.max(0,pt.life); ctx.beginPath(); ctx.arc(pt.x,pt.y,pt.r*pt.life+1,0,Math.PI*2);
-      ctx.fillStyle=pt.c; ctx.fill(); }
+    for(const p of particles){ p.x+=p.vx; p.y+=p.vy; p.vy+=0.05; p.life-=0.02; ctx.globalAlpha=Math.max(0,p.life);
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r*p.life+1,0,Math.PI*2); ctx.fillStyle=p.c; ctx.fill(); }
     ctx.globalAlpha=1; ctx.globalCompositeOperation='source-over';
     particles=particles.filter(p=>p.life>0&&p.y<H+40);
     poses.forEach((pose,pi)=>drawSkeleton(pose,EU_COLORS[pi%EU_COLORS.length]));
@@ -459,72 +626,230 @@
       ctx.font='500 '+Math.round(H*0.03)+'px system-ui,sans-serif'; ctx.fillText(t('part_prompt'),W/2,H*0.5); }
   }
 
-  /* ---- effets partagés / utils ---- */
+  /* ============================ PHOTO ============================ */
+  let photo=null, photoData=null;
+  function startPhoto(){ photo={count:3,last:performance.now(),shot:false}; }
+  function updatePhoto(){
+    if(photo.shot) return;
+    const now=performance.now(); const dt=(now-photo.last)/1000; photo.last=now; photo.count-=dt;
+    poses.forEach((p,i)=>drawSkeleton(p,EU_COLORS[i%EU_COLORS.length]));
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    if(photo.count>0){ ctx.fillStyle='#fff'; ctx.font='800 '+Math.round(H*0.22)+'px system-ui,sans-serif';
+      ctx.fillText(Math.ceil(photo.count), W/2, H*0.45);
+      ctx.font='500 '+Math.round(H*0.03)+'px system-ui,sans-serif'; ctx.fillText(t('ph_countdown'), W/2, H*0.62);
+    } else { photo.shot=true; capturePhoto(); }
+  }
+  function capturePhoto(){
+    const cw=1200, ch=800, top=110, bottom=70, m=36; const off=document.createElement('canvas'); off.width=cw; off.height=ch;
+    const o=off.getContext('2d'); o.fillStyle='#05081c'; o.fillRect(0,0,cw,ch);
+    const iw=cw-2*m, ih=ch-top-bottom, sc=Math.max(iw/vW,ih/vH), dw=vW*sc, dh=vH*sc;
+    o.save(); o.beginPath(); o.rect(m,top,iw,ih); o.clip();
+    o.translate(m+(iw-dw)/2+dw, top+(ih-dh)/2); o.scale(-1,1); o.drawImage(video,0,0,dw,dh); o.restore();
+    o.lineWidth=8; o.strokeStyle='#ffd617'; o.strokeRect(m,top,iw,ih);
+    o.fillStyle='#003399'; o.fillRect(0,0,cw,top);
+    o.fillStyle='#ffd617'; o.textAlign='left'; o.textBaseline='middle'; o.font='700 34px system-ui,sans-serif';
+    o.fillText('★ '+t('ph_caption'), 36, top/2);
+    o.fillStyle='#0b1e5b'; o.fillRect(0,ch-bottom,cw,bottom);
+    o.fillStyle='#fff'; o.textAlign='right'; o.font='500 22px system-ui,sans-serif';
+    o.fillText(new Date().toLocaleString(), cw-36, ch-bottom/2);
+    o.textAlign='left'; o.fillStyle='#ffd617'; o.font='700 22px system-ui,sans-serif'; o.fillText('#EuroPCom', 36, ch-bottom/2);
+    photoData=off.toDataURL('image/png'); statsPhoto();
+    document.getElementById('photoImg').src=photoData;
+    screen='photoActions'; hud.style.display='none'; hideOverlays(); document.getElementById('photoActions').classList.remove('hide');
+  }
+  function downloadPhoto(){ if(!photoData) return; const a=document.createElement('a');
+    a.href=photoData; a.download='europe-day-cor-'+Date.now()+'.png'; document.body.appendChild(a); a.click(); a.remove(); }
+
+  /* ============================ INITIALES (gestes) ============================ */
+  let ini=null;
+  function startInitials(){ ini={letters:[0,0,0],cool:[0,0,0],ok:0}; screen='initials'; hud.style.display='none'; hideOverlays(); }
+  const AZ='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  function updateInitials(){
+    const hands=getHands();
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillStyle='#fff'; ctx.font='700 '+Math.round(H*0.05)+'px system-ui,sans-serif'; ctx.fillText(t('ini_title'), W/2, H*0.14);
+    const colW=W*0.16, gap=W*0.04, totalW=3*colW+2*gap, x0=W/2-totalW/2, midY=H*0.5, boxH=H*0.20;
+    for(let i=0;i<3;i++){
+      const cx=x0+i*(colW+gap)+colW/2;
+      const upY=midY-boxH*0.9-H*0.02, downY=midY+boxH*0.9-H*0.02, arrowH=H*0.11;
+      // zones ▲ ▼
+      let inUp=false,inDown=false;
+      for(const h of hands){ if(Math.abs(h.x-cx)<colW*0.7){
+        if(h.y>upY&&h.y<upY+arrowH) inUp=true; if(h.y>downY&&h.y<downY+arrowH) inDown=true; } }
+      if(ini.cool[i]>0) ini.cool[i]--;
+      if(ini.cool[i]<=0){ if(inUp){ ini.letters[i]=(ini.letters[i]+1)%26; ini.cool[i]=16; }
+        else if(inDown){ ini.letters[i]=(ini.letters[i]+25)%26; ini.cool[i]=16; } }
+      // dessin
+      ctx.fillStyle=inUp?'#ffd617':'rgba(255,255,255,.5)'; ctx.font='700 '+Math.round(H*0.07)+'px system-ui'; ctx.fillText('▲',cx,upY+arrowH/2);
+      ctx.fillStyle=inDown?'#ffd617':'rgba(255,255,255,.5)'; ctx.fillText('▼',cx,downY+arrowH/2);
+      roundRect(cx-colW/2,midY-boxH/2,colW,boxH,18); ctx.fillStyle='rgba(9,20,55,.6)'; ctx.fill();
+      ctx.lineWidth=5; ctx.strokeStyle='rgba(255,214,23,.7)'; ctx.stroke();
+      ctx.fillStyle='#fff'; ctx.font='800 '+Math.round(boxH*0.6)+'px system-ui'; ctx.fillText(AZ[ini.letters[i]],cx,midY);
+    }
+    // bouton OK (dwell)
+    const okW=W*0.24, okH=H*0.12, okX=W/2-okW/2, okY=H*0.74;
+    let inOk=false; for(const h of hands){ if(h.x>okX&&h.x<okX+okW&&h.y>okY&&h.y<okY+okH) inOk=true; }
+    ini.ok=inOk?ini.ok+1:Math.max(0,ini.ok-2);
+    roundRect(okX,okY,okW,okH,20); ctx.fillStyle='rgba(61,220,132,.2)'; ctx.fill(); ctx.lineWidth=5; ctx.strokeStyle='#3ddc84'; ctx.stroke();
+    if(ini.ok>0){ roundRect(okX,okY+okH-12,okW*Math.min(1,ini.ok/DWELL_NEED),12,6); ctx.fillStyle='#3ddc84'; ctx.fill(); }
+    ctx.fillStyle='#fff'; ctx.font='800 '+Math.round(okH*0.4)+'px system-ui'; ctx.fillText(t('ini_ok'),W/2,okY+okH/2);
+    if(ini.ok>=DWELL_NEED){ const name=AZ[ini.letters[0]]+AZ[ini.letters[1]]+AZ[ini.letters[2]];
+      lbSave(lastMode,lastScore,name); showLeaderboard(lastMode); }
+  }
+
+  /* ============================ Fin de partie ============================ */
+  function endGame(mode,score){ lastMode=mode; lastScore=score; statsBumpGame(mode); statsAddScore(mode,score);
+    showGameover(mode,score, lbQualifies(mode,score)); }
+  function showGameover(mode,score,isNew){
+    setText('go_head', isNew?t('go_new'):t('go_head')); setText('go_score',score);
+    setText('go_record', t('go_record').replace('{n}', lbBest(mode)));
+    document.getElementById('go_save').classList.toggle('hide', !isNew); // bouton classement seulement si record
+    screen='gameover'; hud.style.display='none'; hideOverlays(); document.getElementById('gameover').classList.remove('hide');
+  }
+
+  /* ============================ Leaderboard view ============================ */
+  function showLeaderboard(mode){
+    mode=mode||'quiz'; setText('lb_head',t('lb_head'));
+    const body=document.getElementById('lb_body'); body.innerHTML='';
+    body.appendChild(lbColumn(t('lb_today')+' — '+t(mode==='quiz'?'lb_quiz':'lb_catch'), lbTopDay(mode,10)));
+    body.appendChild(lbColumn(t('lb_best')+' — '+t(mode==='quiz'?'lb_quiz':'lb_catch'), lbTopAll(mode,10)));
+    screen='leaderboard'; hud.style.display='none'; hideOverlays(); document.getElementById('leaderboard').classList.remove('hide');
+  }
+  function lbColumn(title,rows){ const wrap=document.createElement('div'); wrap.className='lbcol';
+    const h=document.createElement('h3'); h.textContent=title; wrap.appendChild(h);
+    if(!rows.length){ const p=document.createElement('div'); p.style.opacity=.6; p.textContent=t('lb_empty'); wrap.appendChild(p); return wrap; }
+    const tbl=document.createElement('table'); tbl.className='lb';
+    rows.forEach((r,i)=>{ const tr=document.createElement('tr');
+      tr.innerHTML='<td class="rank">'+(i+1)+'</td><td>'+escapeHtml(r.name)+'</td><td class="sc">'+r.score+'</td>'; tbl.appendChild(tr); });
+    wrap.appendChild(tbl); return wrap; }
+  function escapeHtml(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  /* ============================ Stats view ============================ */
+  function showStats(){ const s=statsGet(); const g=s.games||{};
+    const totalGames=Object.values(g).reduce((a,b)=>a+b,0);
+    let most='—',mostN=-1; for(const k in g){ if(g[k]>mostN){ mostN=g[k]; most=t('hud_'+k)||k; } }
+    const avg=m=>{ const n=(s.scoreN&&s.scoreN[m])||0; return n?((s.scoreSum[m]/n).toFixed(1)):'—'; };
+    const grid=document.getElementById('st_grid');
+    grid.innerHTML=
+      stat(totalGames,t('st_games'))+
+      stat((s.peak||0),t('st_participants'))+
+      stat(most,t('st_most'))+
+      stat(avg('quiz'),t('st_avg')+' — '+t('lb_quiz'))+
+      stat(avg('catch'),t('st_avg')+' — '+t('lb_catch'))+
+      stat((s.photos||0),t('st_photos'));
+    setText('st_head',t('st_head'));
+    screen='stats'; hud.style.display='none'; hideOverlays(); document.getElementById('stats').classList.remove('hide');
+  }
+  function stat(n,l){ return '<div class="stat"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>'; }
+  function exportCSV(){ const s=statsGet(); const lb=lbAll();
+    let csv='type,mode,value\n';
+    for(const k in (s.games||{})) csv+='games,'+k+','+s.games[k]+'\n';
+    for(const k in (s.scoreSum||{})){ const n=s.scoreN[k]||1; csv+='avg_score,'+k+','+(s.scoreSum[k]/n).toFixed(2)+'\n'; }
+    csv+='peak_simultaneous,,'+(s.peak||0)+'\n'; csv+='photos,,'+(s.photos||0)+'\n';
+    csv+='\nname,mode,score,day\n'; lb.forEach(e=>{ csv+=e.name+','+e.mode+','+e.score+','+e.day+'\n'; });
+    const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download='cor-wall-stats-'+todayStr()+'.csv'; document.body.appendChild(a); a.click(); a.remove(); }
+
+  /* ---- effets / utils ---- */
   function burst(x,y){ return {x,y,vx:(Math.random()-0.5)*8,vy:(Math.random()-0.5)*8,life:1,c:EU_COLORS[(Math.random()*EU_COLORS.length)|0]}; }
-  function updateBursts(){ ctx.globalCompositeOperation='lighter';
-    for(const b of game.bursts){ b.x+=b.vx; b.y+=b.vy; b.life-=0.04; ctx.globalAlpha=Math.max(0,b.life);
+  function updateBursts(obj){ ctx.globalCompositeOperation='lighter';
+    for(const b of obj.bursts){ b.x+=b.vx; b.y+=b.vy; b.life-=0.04; ctx.globalAlpha=Math.max(0,b.life);
       ctx.beginPath(); ctx.arc(b.x,b.y,W*0.008*b.life+1,0,Math.PI*2); ctx.fillStyle=b.c; ctx.fill(); }
-    ctx.globalAlpha=1; ctx.globalCompositeOperation='source-over'; game.bursts=game.bursts.filter(b=>b.life>0); }
-  function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y);
-    ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
-  function wrapText(text,cx,cy,maxW,lh){ const words=text.split(' '); let line=''; const lines=[];
+    ctx.globalAlpha=1; ctx.globalCompositeOperation='source-over'; obj.bursts=obj.bursts.filter(b=>b.life>0); }
+  function drawStar(cx,cy,r,rot,color){ ctx.save(); ctx.translate(cx,cy); ctx.rotate(rot); ctx.beginPath();
+    for(let i=0;i<5;i++){ const a=(Math.PI*2*i/5)-Math.PI/2; ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);
+      const a2=a+Math.PI/5; ctx.lineTo(Math.cos(a2)*r*0.45,Math.sin(a2)*r*0.45); }
+    ctx.closePath(); ctx.fillStyle=color; ctx.shadowColor=color; ctx.shadowBlur=20; ctx.fill(); ctx.restore(); ctx.shadowBlur=0; }
+  function roundRect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+  function wrapText(text,cx,cy,maxW,lh){ const words=String(text).split(' '); let line=''; const lines=[];
     for(const w of words){ const tt=line?line+' '+w:w; if(ctx.measureText(tt).width>maxW&&line){ lines.push(line); line=w; } else line=tt; }
     if(line) lines.push(line); const startY=cy-(lines.length-1)*lh/2; lines.forEach((l,i)=>ctx.fillText(l,cx,startY+i*lh)); }
-  let flashMsg=null,flashUntil=0;
-  function flash(msg){ flashMsg=msg; flashUntil=performance.now()+4000; }
 
   /* ---------------- Boucle ---------------- */
   async function loop(){
     if(detector){ try{ poses=await detector.estimatePoses(video,{flipHorizontal:false}); }catch(e){ poses=[]; } }
     drawVideoMirrored();
-    if(mode==='quiz'){ poses.forEach(p=>drawSkeleton(p,'rgba(77,140,255,.55)')); updateQuiz(); }
-    else if(mode==='catch'){ updateCatch(); }
-    else if(mode==='particles'){ updateParticles(); }
+    if(screen==='quiz'){ poses.forEach(p=>drawSkeleton(p,'rgba(77,140,255,.5)')); updateQuiz(); }
+    else if(screen==='catch'){ updateCatch(); }
+    else if(screen==='duel'){ updateDuel(); }
+    else if(screen==='particles'){ updateParticles(); }
+    else if(screen==='photo'){ updatePhoto(); }
+    else if(screen==='initials'){ updateInitials(); }
     else { poses.forEach((p,i)=>drawSkeleton(p,EU_COLORS[i%EU_COLORS.length])); }
-    const peopleEl=document.getElementById('people'); if(peopleEl) peopleEl.textContent=poses.length;
-    if(flashMsg&&performance.now()<flashUntil){ ctx.textAlign='center'; ctx.textBaseline='middle';
-      roundRect(W/2-Math.min(W*0.4,380),H*0.4,Math.min(W*0.8,760),H*0.12,20);
-      ctx.fillStyle='rgba(9,20,55,.85)'; ctx.fill(); ctx.lineWidth=4; ctx.strokeStyle='#ffd617'; ctx.stroke();
-      ctx.fillStyle='#fff'; ctx.font='700 '+Math.round(H*0.038)+'px system-ui,sans-serif'; ctx.fillText(flashMsg,W/2,H*0.46); }
+    if(poses.length) statsPeak(poses.length);
+    const pe=document.getElementById('people'); if(pe) pe.textContent=poses.length;
     requestAnimationFrame(loop);
   }
 
   /* ---------------- Navigation ---------------- */
-  function updateHudTitle(){ const map={quiz:'hud_quiz',catch:'hud_catch',particles:'hud_particles'};
-    if(map[mode]) setText('hudTitle',t(map[mode])); }
-  function setMode(m){
-    mode=m; if(m==='menu'){ showMenu(); return; }
-    menu.classList.add('hide'); hud.style.display='flex';
-    const showScore=(m==='quiz'||m==='catch');
-    document.getElementById('scorePill').classList.toggle('hide',!showScore);
+  function updateHudTitle(){ const map={quiz:'hud_quiz',catch:'hud_catch',duel:'hud_duel',particles:'hud_particles'};
+    if(map[screen]) setText('hudTitle',t(map[screen])); }
+  function enterMode(m){
+    hideOverlays(); menu.classList.add('hide'); hud.style.display='flex'; screen=m;
+    const isGame=(m==='quiz'||m==='catch');
+    document.getElementById('scorePill').classList.toggle('hide',!isGame);
+    document.getElementById('recordPill').classList.toggle('hide',!isGame);
     document.getElementById('timePill').classList.toggle('hide',m!=='catch');
-    document.getElementById('peoplePill').classList.toggle('hide',false);
-    document.getElementById('score').textContent='0';
+    document.getElementById('peoplePill').classList.remove('hide');
+    if(isGame){ document.getElementById('score').textContent='0'; document.getElementById('record').textContent=lbBest(m); }
     updateHudTitle();
-    if(m==='quiz') startQuiz(); if(m==='catch') startCatch(); if(m==='particles') startParticles();
+    if(m==='quiz') startQuiz(); else if(m==='catch') startCatch(); else if(m==='duel') startDuel();
+    else if(m==='particles') startParticles(); else if(m==='photo') startPhoto();
   }
-  function showMenu(){ mode='menu'; menu.classList.remove('hide'); hud.style.display='none'; }
+  function showMenu(){ screen='menu'; hideOverlays(); menu.classList.remove('hide'); hud.style.display='none'; }
 
-  document.querySelectorAll('.mode').forEach(el=>el.addEventListener('click',()=>setMode(el.dataset.mode)));
-  document.getElementById('backBtn').addEventListener('click',()=>setMode('menu'));
-  document.querySelectorAll('#langsw button').forEach(b=>b.addEventListener('click',()=>{
-    lang=b.dataset.lang; try{ localStorage.setItem('cor_lang',lang); }catch(e){} applyLang();
-  }));
-  document.getElementById('camSel').addEventListener('change',async e=>{
-    const id=e.target.value;
-    try{ await startCamera(id); flash(t('cam_changed')); await populateCameras(); }
-    catch(err){ console.error(err); let hint=err&&err.name?err.name:'error';
-      if(err&&err.name==='NotReadableError') hint=t('cam_busy');
-      else if(err&&err.name==='OverconstrainedError') hint=t('cam_over');
-      else if(err&&err.name==='NotAllowedError') hint=t('cam_denied');
-      flash(t('cam_unavail')+hint); }
-  });
-  document.getElementById('fsBtn').addEventListener('click',()=>{
-    if(!document.fullscreenElement) document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();
-    else document.exitFullscreen&&document.exitFullscreen();
-  });
-  window.addEventListener('keydown',e=>{ if(e.key==='Escape') setMode('menu');
-    if(e.key==='f'||e.key==='F') document.getElementById('fsBtn').click(); });
+  document.querySelectorAll('.mode').forEach(el=>el.addEventListener('click',()=>enterMode(el.dataset.mode)));
+  document.getElementById('backBtn').addEventListener('click',showMenu);
+  document.getElementById('lbBtn').addEventListener('click',()=>showLeaderboard('quiz'));
+  document.querySelectorAll('#langsw button').forEach(b=>b.addEventListener('click',()=>{ lang=b.dataset.lang;
+    try{ localStorage.setItem('cor_lang',lang); }catch(e){} applyLang(); }));
+  document.getElementById('camSel').addEventListener('change',async e=>{ const id=e.target.value;
+    try{ await startCamera(id); flashOverlay(t('cam_changed')); await populateCameras(); }
+    catch(err){ let hint=err&&err.name?err.name:'error';
+      if(err&&err.name==='NotReadableError') hint=t('cam_busy'); else if(err&&err.name==='OverconstrainedError') hint=t('cam_over');
+      else if(err&&err.name==='NotAllowedError') hint=t('cam_denied'); flashOverlay(t('cam_unavail')+hint); } });
+  document.getElementById('fsBtn').addEventListener('click',()=>{ if(!document.fullscreenElement)
+    document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen(); else document.exitFullscreen&&document.exitFullscreen(); });
+
+  // Game over
+  document.getElementById('go_save').addEventListener('click',startInitials);
+  document.getElementById('go_again').addEventListener('click',()=>enterMode(lastMode));
+  document.getElementById('go_photo').addEventListener('click',()=>enterMode('photo'));
+  document.getElementById('go_lb').addEventListener('click',()=>showLeaderboard(lastMode));
+  document.getElementById('go_menu').addEventListener('click',showMenu);
+  // Duel over
+  document.getElementById('du_again').addEventListener('click',()=>enterMode('duel'));
+  document.getElementById('du_menu').addEventListener('click',showMenu);
+  // Leaderboard
+  document.getElementById('lb_quiz').addEventListener('click',()=>showLeaderboard('quiz'));
+  document.getElementById('lb_catch').addEventListener('click',()=>showLeaderboard('catch'));
+  document.getElementById('lb_menu').addEventListener('click',showMenu);
+  // Photo
+  document.getElementById('ph_save').addEventListener('click',downloadPhoto);
+  document.getElementById('ph_retake').addEventListener('click',()=>enterMode('photo'));
+  document.getElementById('ph_menu').addEventListener('click',showMenu);
+  // Stats
+  document.getElementById('st_export').addEventListener('click',exportCSV);
+  document.getElementById('st_reset').addEventListener('click',()=>{ if(confirm(t('confirm_reset'))){
+    try{ localStorage.removeItem(LB_KEY); localStorage.removeItem(ST_KEY); }catch(e){} showStats(); } });
+  document.getElementById('st_close').addEventListener('click',showMenu);
+
+  window.addEventListener('keydown',e=>{ if(e.key==='Escape') showMenu();
+    if(e.key==='f'||e.key==='F') document.getElementById('fsBtn').click();
+    if(e.key==='s'||e.key==='S') showStats(); });
+
+  // Toast DOM (feedback caméra)
+  let toastEl=null, toastTimer=null;
+  function flashOverlay(msg){
+    if(!toastEl){ toastEl=document.createElement('div');
+      toastEl.style.cssText='position:fixed;left:50%;bottom:8vh;transform:translateX(-50%);z-index:20;'+
+        'background:rgba(9,20,55,.92);border:1px solid #ffd617;color:#fff;font-weight:700;'+
+        'padding:14px 26px;border-radius:999px;font-size:18px;box-shadow:0 12px 40px rgba(0,0,0,.5)';
+      document.body.appendChild(toastEl); }
+    toastEl.textContent=msg; toastEl.style.display='block';
+    clearTimeout(toastTimer); toastTimer=setTimeout(()=>{ if(toastEl) toastEl.style.display='none'; },2600);
+  }
 
   init();
 })();
