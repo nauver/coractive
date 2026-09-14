@@ -82,6 +82,15 @@
   .hide{display:none!important}
   .footnote{position:absolute;bottom:12px;left:0;right:0;text-align:center;font-size:12px;opacity:.5;z-index:6}
   #photoImg{max-width:70vw;max-height:64vh;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+  /* Curseur main (navigation gestuelle) */
+  #cursor{position:fixed;left:0;top:0;width:76px;height:76px;transform:translate(-50%,-50%);z-index:9999;pointer-events:none;display:none}
+  #cursor svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+  #cursor .track{fill:none;stroke:rgba(255,255,255,.35);stroke-width:8}
+  #cursor .prog{fill:none;stroke:var(--eu-gold);stroke-width:8;stroke-linecap:round;stroke-dasharray:289;stroke-dashoffset:289}
+  #cursor .dot{position:absolute;left:50%;top:50%;width:18px;height:18px;border-radius:50%;background:var(--eu-gold);
+    transform:translate(-50%,-50%);box-shadow:0 0 14px rgba(255,214,23,.9)}
+  .ghover{outline:4px solid var(--eu-gold)!important;outline-offset:3px;filter:brightness(1.08)}
+  .mode.ghover{border-color:var(--eu-gold)!important;box-shadow:0 18px 50px rgba(0,0,0,.55);transform:translateY(-6px)}
 </style>
 </head>
 <body>
@@ -112,6 +121,7 @@
     <div class="mode" data-mode="particles"><div class="ico">✨</div><h3 id="p_t"></h3><p id="p_d"></p></div>
     <div class="mode" data-mode="photo"><div class="ico">📸</div><h3 id="ph_t"></h3><p id="ph_d"></p></div>
   </div>
+  <p class="sub" id="m_hint" style="margin:1.5vmin 0 0;opacity:.7;font-size:clamp(13px,1.7vmin,18px)"></p>
   <div class="row2">
     <button class="btn ghost" id="lbBtn"></button>
     <label class="camwrap">📷&nbsp;<select id="camSel" class="camsel"></select></label>
@@ -189,6 +199,7 @@
   </div>
 </div>
 
+<div id="cursor"><svg viewBox="0 0 100 100"><circle class="track" cx="50" cy="50" r="46"/><circle class="prog" cx="50" cy="50" r="46"/></svg><div class="dot"></div></div>
 <div class="footnote" id="footnote"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
@@ -220,6 +231,7 @@
       cam_changed:"Camera switched ✔", cam_unavail:"Camera unavailable: ",
       cam_busy:"already in use by another app", cam_over:"resolution not supported", cam_denied:"access denied",
       footnote:"Webcam · TensorFlow.js MoveNet · no image is sent — everything runs in your browser",
+      hand_hint:"✋ Raise a hand and hold it over a tile to choose",
       go_head:"Well played!", go_new:"🏆 New high score!", go_record:"Record to beat: {n}",
       go_again:"↻ Play again", go_photo:"📸 Souvenir photo", go_lb:"🏆 Leaderboard", go_menu:"← Menu",
       go_save:"🏆 Save to leaderboard", gate_prompt:"Stand in the circle to start",
@@ -256,6 +268,7 @@
       cam_changed:"Caméra changée ✔", cam_unavail:"Caméra indisponible : ",
       cam_busy:"déjà utilisée par une autre appli", cam_over:"résolution non supportée", cam_denied:"accès refusé",
       footnote:"Webcam · TensorFlow.js MoveNet · aucune image n'est envoyée — tout tourne dans le navigateur",
+      hand_hint:"✋ Lève une main et maintiens-la sur une case pour choisir",
       go_head:"Bien joué !", go_new:"🏆 Nouveau record !", go_record:"Record à battre : {n}",
       go_again:"↻ Rejouer", go_photo:"📸 Photo souvenir", go_lb:"🏆 Classement", go_menu:"← Menu",
       go_save:"🏆 Entrer au classement", gate_prompt:"Place-toi dans le cercle pour commencer",
@@ -292,6 +305,7 @@
       cam_changed:"Kamera gewechselt ✔", cam_unavail:"Kamera nicht verfügbar: ",
       cam_busy:"bereits von einer anderen App benutzt", cam_over:"Auflösung nicht unterstützt", cam_denied:"Zugriff verweigert",
       footnote:"Webcam · TensorFlow.js MoveNet · kein Bild wird gesendet — alles läuft im Browser",
+      hand_hint:"✋ Hebe eine Hand und halte sie über eine Kachel zum Wählen",
       go_head:"Gut gespielt!", go_new:"🏆 Neuer Rekord!", go_record:"Zu schlagender Rekord: {n}",
       go_again:"↻ Nochmal", go_photo:"📸 Erinnerungsfoto", go_lb:"🏆 Bestenliste", go_menu:"← Menü",
       go_save:"🏆 In die Bestenliste", gate_prompt:"Stell dich in den Kreis, um zu starten",
@@ -369,7 +383,7 @@
     setText('fsBtn',t('fullscreen')); setText('backBtn',t('back')); setText('lbBtn',t('leaderboard'));
     setText('lblScore',t('lblScore')); setText('lblTime',t('lblTime'));
     setText('lblPeople',t('lblPeople')); setText('lblRecord',t('lblRecord'));
-    setText('footnote',t('footnote'));
+    setText('footnote',t('footnote')); setText('m_hint',t('hand_hint'));
     setText('go_again',t('go_again')); setText('go_photo',t('go_photo')); setText('go_lb',t('go_lb')); setText('go_menu',t('go_menu')); setText('go_save',t('go_save'));
     setText('du_again',t('du_again')); setText('du_menu',t('du_menu'));
     setText('lb_quiz',t('lb_quiz')); setText('lb_catch',t('lb_catch')); setText('lb_menu',t('lb_menu'));
@@ -766,6 +780,31 @@
     for(const w of words){ const tt=line?line+' '+w:w; if(ctx.measureText(tt).width>maxW&&line){ lines.push(line); line=w; } else line=tt; }
     if(line) lines.push(line); const startY=cy-(lines.length-1)*lh/2; lines.forEach((l,i)=>ctx.fillText(l,cx,startY+i*lh)); }
 
+  /* ============ Curseur main : navigation 100% gestuelle sur menus/overlays ============ */
+  const cursorEl=document.getElementById('cursor');
+  const progEl=cursorEl?cursorEl.querySelector('.prog'):null;
+  const POINT_NEED=42, RING_C=289;
+  let ptr={target:null,dwell:0,cool:0};
+  function primaryHand(){ let best=null; for(const h of getHands()){ if(!best||h.y<best.y) best=h; } return best; }
+  function setRing(f){ if(progEl) progEl.style.strokeDashoffset=(RING_C*(1-Math.max(0,Math.min(1,f)))); }
+  function clearHover(){ document.querySelectorAll('.ghover').forEach(e=>e.classList.remove('ghover')); }
+  function overlayOpen(){ return OVL.some(id=>!document.getElementById(id).classList.contains('hide')); }
+  function updatePointer(){
+    if(!overlayOpen()){ if(cursorEl) cursorEl.style.display='none'; ptr.target=null; ptr.dwell=0; clearHover(); return; }
+    const h=primaryHand();
+    if(!h){ cursorEl.style.display='none'; ptr.target=null; ptr.dwell=0; setRing(0); clearHover(); return; }
+    cursorEl.style.display='block'; cursorEl.style.left=h.x+'px'; cursorEl.style.top=h.y+'px';
+    if(ptr.cool>0){ ptr.cool--; setRing(0); return; }
+    const el=document.elementFromPoint(h.x,h.y);
+    const act=el&&el.closest?el.closest('button:not([disabled]), .mode'):null;
+    const usable=act && act.offsetParent!==null && !act.classList.contains('hide');
+    if(usable){
+      if(act===ptr.target){ ptr.dwell++; } else { ptr.target=act; ptr.dwell=0; clearHover(); act.classList.add('ghover'); }
+      setRing(ptr.dwell/POINT_NEED);
+      if(ptr.dwell>=POINT_NEED){ ptr.dwell=0; ptr.cool=28; clearHover(); act.click(); }
+    } else { ptr.target=null; ptr.dwell=0; setRing(0); clearHover(); }
+  }
+
   /* ---------------- Boucle ---------------- */
   async function loop(){
     if(detector){ try{ poses=await detector.estimatePoses(video,{flipHorizontal:false}); }catch(e){ poses=[]; } }
@@ -779,6 +818,7 @@
     else { poses.forEach((p,i)=>drawSkeleton(p,EU_COLORS[i%EU_COLORS.length])); }
     if(poses.length) statsPeak(poses.length);
     const pe=document.getElementById('people'); if(pe) pe.textContent=poses.length;
+    updatePointer();
     requestAnimationFrame(loop);
   }
 
