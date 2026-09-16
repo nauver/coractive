@@ -1,0 +1,4 @@
+numpy
+websockets
+# Binding OpenNI2 pour l'Astra Pro (selon ton install : "openni" ou "primesense") :
+openni

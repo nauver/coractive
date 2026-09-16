@@ -1,0 +1,11 @@
+# Déploiement Netlify (bonus — GitHub Pages est géré par .github/workflows/deploy-pages.yml)
+# Le site est un simple fichier statique : rien à builder.
+[build]
+  publish = "."
+  command = ""
+
+# Le dossier bridge/ n'est pas un contenu web ; on évite de l'exposer inutilement.
+[[redirects]]
+  from = "/bridge/*"
+  to = "/404.html"
+  status = 404

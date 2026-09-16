@@ -1,91 +1,117 @@
-# Mur interactif — Comité européen des régions (Europe Day)
+# LumoCoR
 
-Mur interactif trilingue (**EN / FR / DE**) pour la gamification du CoR : on joue avec son
-corps devant une webcam, sans manette. Conçu pour être projeté sur un mur lors d'événements
-grand public (Europe Day, EuroPCom…).
+Mur & sol interactifs façon **Lumo Play** pour le Comité européen des régions (CoR).
+33 jeux (particules, physique, nature, lumière, cibles, dalles, collecte, éducatif,
+photobooth, fêtes, 2 joueurs) pilotés par **détection de mouvement webcam** ou par la
+**caméra 3D Orbbec Astra Pro**. Une seule page, aucune dépendance externe (hors Google
+Fonts), 100 % dans le navigateur — rien n'est envoyé sur un serveur.
 
-Détection de pose 100 % dans le navigateur via **TensorFlow.js MoveNet** (jusqu'à 6 personnes
-suivies simultanément). **Aucune image n'est envoyée** : tout tourne côté client.
+Application autonome : `index.html` à la racine. C'est tout ce qu'il faut pour le web.
 
-## Modes
+---
 
-- 🧠 **Quiz corporel** — 5 questions par manche (UE, CoR, EuroPCom…), réponse en gardant une
-  main dans la bonne zone. Réponses mélangées à chaque partie.
-- ⭐ **Attrape les étoiles** — attraper les étoiles qui tombent, 45 s.
-- ⚔️ **Duel (2 joueurs)** — Équipe A (gauche) vs Équipe B (droite), qui en attrape le plus.
-- ✨ **Miroir de particules** — le corps génère des traînées aux couleurs de l'Europe.
-- 📸 **Photo souvenir** — compte à rebours, cadre CoR/EuroPCom, enregistrement en PNG (offline).
+## Déployer sur GitHub Pages
 
-## Fonctionnalités événementielles
+### Méthode A — GitHub Actions (incluse, recommandée)
 
-- 🏆 **Leaderboard local** : Top 10 du jour + meilleur score de l'événement (Quiz et Attrape).
-  Saisie des **initiales par gestes** (façon borne d'arcade) quand on entre dans le classement.
-- 🎯 **Record à battre** affiché pendant les parties Quiz/Attrape.
-- 📊 **Statistiques anonymes** : parties jouées, mode le plus joué, score moyen, pic de
-  personnes simultanées, photos prises. Accès par la touche **`S`**, export **CSV**, remise à zéro.
-- Sélecteur de **langue** et de **caméra** (choix mémorisés), **plein écran** (`F`), **menu** (`Échap`).
+1. Crée un dépôt GitHub (ex. `lumocor`) et pousse ce dossier :
+   ```bash
+   git init
+   git add .
+   git commit -m "LumoCoR"
+   git branch -M main
+   git remote add origin https://github.com/<ton-compte>/lumocor.git
+   git push -u origin main
+   ```
+2. Sur GitHub : **Settings → Pages → Build and deployment → Source : GitHub Actions**.
+3. Le workflow `.github/workflows/deploy-pages.yml` se lance à chaque `push` sur `main`
+   et publie le site. L'URL apparaît dans l'onglet **Actions** puis dans **Settings → Pages**
+   (`https://<ton-compte>.github.io/lumocor/`).
 
-Toutes les données (scores, stats) sont stockées **uniquement dans le navigateur du poste**
-(localStorage) — rien n'est envoyé à l'extérieur.
+### Méthode B — sans Actions (déploiement depuis une branche)
+
+**Settings → Pages → Source : Deploy from a branch → `main` / `/ (root)`**.
+GitHub sert alors `index.html` directement. Le fichier `.nojekyll` évite tout traitement Jekyll.
+
+> L'app fonctionne à n'importe quelle sous-URL (site de projet `.../lumocor/`) :
+> tous les chemins sont relatifs/inline.
+
+---
+
+## Utilisation
+
+- Ouvre la page, clique **Caméra & calibrage**, puis **Activer la webcam**.
+  La webcam sert de capteur de mouvement (aucune image n'est enregistrée ni transmise).
+- Sans webcam, le mode **Souris/doigt** permet de tout tester.
+- Règle **sensibilité**, **miroir** et **retournement** selon le placement caméra/projecteur.
+- Trilingue **FR / EN / DE**.
+
+> La webcam exige un contexte sécurisé : **HTTPS** (GitHub Pages l'est) ou **localhost**.
+
+---
+
+## Caméra 3D Orbbec Astra Pro (profondeur)
+
+Le navigateur **ne peut pas** lire la profondeur Orbbec directement (via getUserMedia il
+ne voit que la caméra couleur UVC). Le dossier `bridge/` contient un **pont local** qui lit
+la profondeur (OpenNI2), en déduit une grille d'occupation et la diffuse en **WebSocket**.
+L'app s'y connecte via *Caméra & calibrage → source « Orbbec 3D »*.
+
+```bash
+cd bridge
+pip install -r requirements.txt      # numpy, websockets, + binding OpenNI2
+python orbbec_depth_bridge.py --openni-redist "C:/Program Files/OpenNI2/Redist"
+# test sans caméra :
+python orbbec_depth_bridge.py --sim
+```
+
+**Contrainte importante — contenu mixte.** Une page servie en **HTTPS** (github.io) qui se
+connecte à `ws://localhost:8765` (non chiffré) est bloquée par certains navigateurs.
+Pour la profondeur, deux options fiables :
+
+- **Servir la page en local** à côté du pont :
+  ```bash
+  python -m http.server 8080   # puis http://localhost:8080
+  ```
+  (localhost est un contexte sécurisé, le WebSocket local passe.)
+- Ou exposer le pont en **wss://** (reverse-proxy TLS) si tu tiens à l'héberger sur Pages.
+
+> Le mode **webcam frame-diff** marche parfaitement sur GitHub Pages ; seule la profondeur
+> Orbbec demande un hébergement local (ou wss).
+
+---
 
 ## Structure
 
 ```
-.
-├── index.html                     # l'application (fichier unique, autonome)
-├── README.md
-├── NOTICE.md                      # licences & RGPD
-├── .gitignore
-└── .github/workflows/deploy.yml   # déploiement automatique GitHub Pages
+index.html                         L'application (tout-en-un)
+.nojekyll                          Désactive Jekyll sur GitHub Pages
+netlify.toml                       Déploiement Netlify (bonus)
+.github/workflows/deploy-pages.yml Déploiement GitHub Pages automatique
+bridge/
+  orbbec_depth_bridge.py           Pont profondeur Orbbec -> WebSocket
+  requirements.txt
 ```
 
-Bibliothèques chargées via CDN : aucun build, aucune dépendance à installer.
+## Confidentialité (RGPD)
 
-## Lancer en local
+Au premier usage de la caméra, une **fenêtre de consentement** s'affiche et **bloque
+l'activation** tant qu'elle n'est pas acceptée. Elle précise que la caméra sert
+uniquement à détecter les mouvements, que les images sont traitées **localement dans le
+navigateur**, que **rien n'est enregistré, transmis ni conservé**, et qu'il n'y a **aucune
+reconnaissance faciale ni donnée biométrique**. L'utilisateur peut refuser et jouer à la
+souris / au doigt. Le consentement est mémorisé localement (localStorage) ; le lien
+« Confidentialité & crédits » en bas de page permet de rouvrir la note à tout moment.
 
-Ouvrir `index.html` dans **Chrome** et autoriser la caméra. Sur `file://` l'accès caméra peut
-être capricieux ; sinon servir le dossier :
-```bash
-python -m http.server 8000    # puis http://localhost:8000
-```
+## Crédits & mentions
 
-## Déployer sur GitHub Pages
+- Contours des pays : **Natural Earth** (domaine public), via `world-atlas`.
+- Drapeaux : **flag-icons** (licence MIT ; visuels du domaine public).
+- Polices : **Bricolage Grotesque** & **Manrope** (Google Fonts, licence SIL OFL).
+- Détection de mouvement : 100 % navigateur, sans dépendance externe.
+- © 2026 LumoCoR — projet pour le Comité européen des régions.
 
-1. Pousser ce dossier sur un dépôt GitHub :
-   ```bash
-   git init && git add . && git commit -m "Mur interactif CoR — Europe Day"
-   git branch -M main
-   git remote add origin https://github.com/<utilisateur>/<depot>.git
-   git push -u origin main
-   ```
-2. **Settings → Pages → Source : GitHub Actions**. À chaque push, le site est publié en HTTPS
-   (`https://<utilisateur>.github.io/<depot>/`). L'HTTPS fiabilise l'accès caméra.
+## Licence
 
-(Option sans workflow : **Settings → Pages → Deploy from a branch → `main` / root** ; on peut
-alors supprimer `.github/workflows/deploy.yml`.)
-
-## Déployer sur Netlify
-
-Glisser-déposer le dossier sur https://app.netlify.com, ou connecter le dépôt. Pas de build ;
-répertoire de publication : la racine.
-
-## Personnalisation
-
-- **Questions du quiz** : objet `QUIZ` dans `index.html` (une liste par langue ; `correct` =
-  index de la bonne réponse dans `[a, b]`). Le nombre de questions par manche = `QUIZ_ROUND`.
-- ⚠️ **Question « présidence du Conseil »** : datée. Actuellement **Irlande** (2ᵉ semestre 2026) —
-  à mettre à jour chaque semestre (chercher `id:"presidency"`).
-- **Slogan EuroPCom** : la question actuelle décrit EuroPCom comme « la plus grande conférence
-  européenne de communication publique ». Adapter dans `QUIZ` si besoin.
-- **Traductions d'interface** : objet `I18N`. **Couleurs** : variables CSS en haut du fichier.
-
-## Note caméra
-
-L'accès webcam exige un **contexte sécurisé** (`https://` ou `localhost`). Une caméra affichée
-en noir vient en général d'une caméra virtuelle (VPN, OBS, outil de sécurité) qui tient le
-matériel — il faut la libérer/désactiver.
-
-## Technologies
-
-TensorFlow.js · pose-detection (MoveNet MultiPose Lightning) · Canvas 2D · HTML/CSS/JS vanilla.
-Licences : voir `NOTICE.md`.
+Code applicatif : à toi de choisir (MIT conseillé). Aucune dépendance JS externe embarquée
+(hors Google Fonts). Le pont utilise numpy / websockets / OpenNI2 selon leurs licences.
